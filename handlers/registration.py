@@ -2,16 +2,16 @@ import re
 
 from aiogram import types, Router
 from aiogram.filters import Command, Text
-from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from keyboards import base_keyboard
+from aiogram.fsm.state import StatesGroup, State
 
 router = Router()
 
 
 # region validators
-def validate_email(email):
+def validate_email(email: str) -> bool:
     pattern = r"^[-\w\.]+@([-\w]+\.)+[-\w]{2,4}$"
     if re.match(pattern, email) is None:
         return False
@@ -19,7 +19,7 @@ def validate_email(email):
         return True
 
 
-def validate_password(password):
+def validate_password(password: str) -> bool:
     pattern_password = re.compile(r'^(?=.*[0-9].*)(?=.*[a-z].*)(?=.*[A-Z].*)[0-9a-zA-Z]{8,}$')
     if pattern_password.match(password):
         return True
@@ -27,8 +27,13 @@ def validate_password(password):
         return False
 
 
-# endregion validators
+def validate_name(value: str) -> bool:
+    if value.isalpha() and value.istitle() and 2 <= len(value) <= 24:
+        return True
+    return False
 
+
+# endregion validators
 
 class RegistrationStates(StatesGroup):
     write_mail = State()
@@ -99,18 +104,32 @@ async def register_first_name(message: Message, state: FSMContext):
 
 @router.message(RegistrationStates.write_first_name)
 async def register_last_name(message: Message, state: FSMContext):
-    await state.update_data(first_name=message.text)
-    await message.answer(
-        "Введите фамилию:",
-    )
-    await state.set_state(RegistrationStates.write_last_name)
+    first_name = message.text
+    if validate_name(first_name) is False:
+        await message.answer(
+            'Введенное имя некорректно'
+        )
+        await state.set_state(RegistrationStates.write_first_name)
+    else:
+        await state.update_data(first_name=message.text)
+        await message.answer(
+            "Введите фамилию:",
+        )
+        await state.set_state(RegistrationStates.write_last_name)
 
 
 @router.message(RegistrationStates.write_last_name)
 async def register_last_name(message: Message, state: FSMContext):
-    await state.update_data(last_name=message.text)
-    data = await state.get_data()
-    await message.answer(
-        f'Ваши данные{data}'
-    )
-    await state.clear()
+    last_name = message.text
+    if validate_name(last_name) is False:
+        await message.answer(
+            'Введенная фамилия некорректна'
+        )
+        await state.set_state(RegistrationStates.write_last_name)
+    else:
+        await state.update_data(last_name=message.text)
+        data = await state.get_data()
+        await message.answer(
+            f'Ваши данные{data}'
+        )
+        await state.clear()
