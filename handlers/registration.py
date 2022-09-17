@@ -1,10 +1,11 @@
 import re
-
-from aiogram import types, Router
-from aiogram.filters import Command, Text
+from aiogram import Router
+from aiogram.filters import Text
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
-from keyboards import base_keyboard
+
+from api_requests.user import register
+from keyboards import base_keyboard, registration_keyboard
 from aiogram.fsm.state import StatesGroup, State
 
 router = Router()
@@ -41,6 +42,8 @@ class RegistrationStates(StatesGroup):
     write_password2 = State()
     write_first_name = State()
     write_last_name = State()
+    register = State()
+    register_edit_data = State()
 
 
 @router.message(Text(text="Регистрация"))
@@ -61,9 +64,9 @@ async def register_password1(message: Message, state: FSMContext):
         )
         await state.set_state(RegistrationStates.write_mail)
     else:
-        await state.update_data(mail=email)
+        await state.update_data(email=email)
         await message.answer(
-            "Введите пароль:",
+            "Укажите пароль:",
         )
         await state.set_state(RegistrationStates.write_password1)
 
@@ -73,7 +76,11 @@ async def register_password2(message: Message, state: FSMContext):
     password = message.text
     if validate_password(password) is False:
         await message.answer(
-            'Пароль слишком простой, попробуйте еще раз.'
+            f'Пароль слишком простой, попробуйте еще раз\n'
+            f'Пароль должен:\n'
+            f'- Содержать число\n'
+            f'- Содержать символ верхнего и нижнего регистра\n'
+            f'- Содержать минимум 8 символов'
         )
         await state.set_state(RegistrationStates.write_password1)
     else:
@@ -118,6 +125,7 @@ async def register_last_name(message: Message, state: FSMContext):
         await state.set_state(RegistrationStates.write_last_name)
 
 
+@router.message(Text(text="Назад"))
 @router.message(RegistrationStates.write_last_name)
 async def register_last_name(message: Message, state: FSMContext):
     last_name = message.text
@@ -130,6 +138,61 @@ async def register_last_name(message: Message, state: FSMContext):
         await state.update_data(last_name=message.text)
         data = await state.get_data()
         await message.answer(
-            f'Ваши данные{data}'
+            f'Ваши данные для регистрации \n'
+            f'E-mail: {data.get("email")}\n'
+            f'Пароль: {data.get("password1")}\n'
+            f'Имя: {data.get("first_name")}\n'
+            f'Фамилия: {data.get("last_name")}\n'
+            f'Если все верно нажмите «Зарегистрироватся»\n'
+            f'Если вы хотите исправить данные, нажмите «Изменить данные»\n'
+            f'Отменить регистрацию, нажмите «Отмена»',
+            reply_markup=registration_keyboard.reg_keyboard.as_markup(resize_keyboard=True)
+        )
+        await state.set_state(RegistrationStates.register)
+
+
+@router.message(Text(text="Зарегистрироватся"))
+async def registration(message: Message, state: FSMContext):
+    validated_data = await state.get_data()
+    if await register(validated_data, message.from_user.id) is True:
+        await message.answer(
+            f'Регистрация прошла успешно, письмо с подтверждением отправлено '
+            f'на почту {validated_data.get("email")}\n'
+            f'Перейдите по ссылке в письме для завершения регистрации',
+            reply_markup=base_keyboard.keyboard.as_markup(resize_keyboard=True)
         )
         await state.clear()
+    else:
+        await message.answer(
+            f'Ошибка регистрации, попробуйте еще\n'
+            f'Не забудьте убедится в правильности введенных данных',
+            reply_markup=base_keyboard.keyboard.as_markup(resize_keyboard=True)
+        )
+
+
+@router.message(Text(text="Изменить данные"))
+async def register_edit_data(message: Message, state: FSMContext):
+    data = await state.get_data()
+    email = data.get('email')
+    password1 = data.get('password1')
+    password2 = data.get('password2')
+    first_name = data.get('first_name')
+    last_name = data.get('last_name')
+
+    await message.answer(
+        f'Чтобы изменить данные, скопируйте шаблон ниже и отредактирував нужные поля пришлите его сообщением\n\n'
+        f'E-mail: {email}\n'
+        f'Пароль: {password1}\n'
+        f'Повторите пароль: {password2}\n'
+        f'Имя: {first_name}\n'
+        f'Фамилия: {last_name}\n\n'
+        f'Передумали!? Нажмите кнопку «Назад»\n'
+        f'Отменить регистрацию, нажмите «Отмена»',
+        reply_markup=registration_keyboard.reg_keyboard_edit
+    )
+    await state.set_state(RegistrationStates.register_edit_data)
+
+
+@router.message(RegistrationStates.register_edit_data)
+async def register_edit_data_done():
+    pass
