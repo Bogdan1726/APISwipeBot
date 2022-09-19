@@ -1,6 +1,21 @@
 from aiogram import types
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
+# types.KeyboardButton(text="Запросить геолокацию", request_location=True),
+# types.KeyboardButton(text="Запросить контакт", request_contact=True)
+
+btn_language = [
+    [
+        types.KeyboardButton(text="Русский"),
+        types.KeyboardButton(text="Украинский")
+    ]
+
+]
+language = types.ReplyKeyboardMarkup(
+    keyboard=btn_language,
+    resize_keyboard=True
+)
+
 
 keyboard = ReplyKeyboardBuilder()
 keyboard.row(
@@ -20,16 +35,6 @@ cancel = types.ReplyKeyboardMarkup(
     resize_keyboard=True
 )
 
-btn_language = [
-    [
-        types.KeyboardButton(text="Рус"),
-        types.KeyboardButton(text="Укр")
-    ]
-]
-language = types.ReplyKeyboardMarkup(
-    keyboard=btn_language,
-    resize_keyboard=True
-)
 
 btn_auth = [
     [
@@ -39,14 +44,5 @@ btn_auth = [
 ]
 auth = types.ReplyKeyboardMarkup(
     keyboard=btn_auth,
-    resize_keyboard=True
-)
-
-
-btn_menu = [
-    [types.KeyboardButton(text="Главное меню")]
-]
-menu = types.ReplyKeyboardMarkup(
-    keyboard=btn_menu,
     resize_keyboard=True
 )

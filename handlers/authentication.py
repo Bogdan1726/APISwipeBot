@@ -3,7 +3,7 @@ from aiogram.client.session import aiohttp
 from aiogram.filters import Command, Text
 from aiogram.types import Message
 from api_requests.user import login
-from keyboards import base_keyboard
+from keyboards import base_keyboard, authentication_keyboard, management_keyboards
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
@@ -55,8 +55,9 @@ async def authentication(message: Message, state: FSMContext):
     validated_data = await state.get_data()
     if await login(validated_data, message.from_user.id) is True:
         await message.answer(
-            'Вы успешно авторизованы',
-            reply_markup=base_keyboard.menu
+            f'Авторизация прошла успешно\n'
+            f'Добро пожаловать в Главное меню',
+            reply_markup=management_keyboards.menu.as_markup(resize_keyboard=True)
         )
         await state.clear()
     else:
