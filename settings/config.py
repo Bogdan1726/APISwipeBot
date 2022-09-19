@@ -6,6 +6,7 @@ from pymongo import MongoClient
 load_dotenv()
 
 TOKEN = str(os.getenv('TOKEN'))
+HOST = str(os.getenv('HOST'))
 
 # region db
 DB_HOST = str(os.getenv('DB_HOST'))

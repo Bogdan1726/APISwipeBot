@@ -2,7 +2,8 @@ from aiogram import types, Router
 from aiogram.client.session import aiohttp
 from aiogram.filters import Command, Text
 from aiogram.types import Message
-from keyboards import base_keyboard
+from api_requests.user import login
+from keyboards import base_keyboard, authentication_keyboard, management_keyboards
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
@@ -39,7 +40,11 @@ async def authentication(message: Message, state: FSMContext):
     await state.update_data(password=message.text)
     data = await state.get_data()
     await message.answer(
-        f'Ваши данные{data}',
+        f'Ваши данные для входа \n'
+        f'E-mail: {data.get("email")}\n'
+        f'Пароль: {data.get("password")}\n'
+        f'Если все верно нажмите кнопку «Авторизоватся»\n'
+        f'В противном случае нажмите «Отмена» и повторите попытку',
         reply_markup=base_keyboard.auth
     )
     await state.set_state(AuthenticationStates.auth)
@@ -48,22 +53,34 @@ async def authentication(message: Message, state: FSMContext):
 @router.message(Text(text="Авторизоватся"))
 async def authentication(message: Message, state: FSMContext):
     validated_data = await state.get_data()
-    data = {
-        'email': validated_data.get('email'),
-        'password': validated_data.get('password')
-    }
-    async with aiohttp.ClientSession() as session:
-        response = await session.post(url='http://164.90.255.130/login/', data=data)
-        if response.status == 200:
-            body = await response.json()
-            await message.answer(
-                f'{body.get("access_token")}'
-            )
-        else:
-            await message.answer(
-                'Ошибка'
-            )
+    if await login(validated_data, message.from_user.id) is True:
+        await message.answer(
+            f'Авторизация прошла успешно\n'
+            f'Добро пожаловать в Главное меню',
+            reply_markup=management_keyboards.menu.as_markup(resize_keyboard=True)
+        )
         await state.clear()
+    else:
+        await message.answer(
+            f'Ошибка авторизации, попробуйте еще\n'
+            f'Не забудьте убедится в правильности введенных данных',
+            reply_markup=base_keyboard.keyboard.as_markup(resize_keyboard=True)
+        )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
