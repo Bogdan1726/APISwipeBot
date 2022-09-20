@@ -10,5 +10,6 @@ class User(Document):
     token = fields.StringField(required=True)
     refresh_token = fields.StringField(required=True)
     is_authenticated = fields.BooleanField(default=False)
+    language = fields.StringField(default='ru')
 
 

@@ -2,8 +2,13 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 from pymongo import MongoClient
+from aioredis import Redis
+
 
 load_dotenv()
+
+redis = Redis()
+
 
 TOKEN = str(os.getenv('TOKEN'))
 HOST = str(os.getenv('HOST'))
@@ -16,6 +21,5 @@ DB_NAME = str(os.getenv('DB_NAME'))
 
 # region language
 I18N_DOMAIN = 'APISwipeBot'
-BASE_DIR = Path(__file__).parent
-LOCALES_DIR = BASE_DIR / 'locale'
+LOCALES_DIR = 'locales'
 # endregion language

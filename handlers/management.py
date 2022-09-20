@@ -31,5 +31,10 @@ async def user_profile(message: Message, state: FSMContext):
                 f'E-mail: {data.get("email")}',
                 reply_markup=management_keyboards.profile
             )
+        else:
+            await message.answer(
+                'Пожалуйста войдите или зарегистрируйтесь чтобы продолжить',
+                reply_markup=base_keyboard.keyboard.as_markup(resize_keyboard=True)
+            )
 
-# endregion profile
+            # endregion profile

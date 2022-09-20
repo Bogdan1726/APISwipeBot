@@ -10,6 +10,15 @@ url = URL.build(
 )
 
 
+def header(user):
+    token = get_token(user)
+    headers = {
+        'accept': 'application/json',
+        'Authorization': 'Bearer ' + token
+    }
+    return headers
+
+
 async def login(validated_data, user_id):
     data = {
         'email': validated_data.get('email'),
@@ -58,36 +67,19 @@ async def send_refresh_token(user):
             return False
 
 
-async def test(request, user):
-    response = await request
-    if response.status == 401:
-        async with aiohttp.ClientSession() as session:
-            token = get_refresh_token(user)
-            req = session.post(
-                url=url.with_path('/api/token/refresh/'),
-                data={"refresh": str(token)}
-            )
-            resp = await req
-            if resp.status == 200:
-                body = await resp.json()
-                update_token(body, user)
-                response = await request
-                print(response.json())
-            else:
-                logout(user)
-    return response
-
-
 async def profile(user):
+    endpoint = url.with_path('/user-profile/get_profile/')
     async with aiohttp.ClientSession() as session:
-        request = session.get(
-            url=url.with_path('/user-profile/get_profile/'),
-            headers={
-                'accept': 'application/json',
-                'Authorization': 'Bearer ' + get_token(user)
-            }
-        )
-        response = await test(request, user)
+        request = session.get(url=endpoint, headers=header(user))
+        response = await request
         if response.status == 200:
             body = await response.json()
             return body
+        if response.status == 401:
+            if await send_refresh_token(user):
+                request = session.get(url=endpoint, headers=header(user))
+                response = await request
+                body = await response.json()
+                return body
+            else:
+                return False
