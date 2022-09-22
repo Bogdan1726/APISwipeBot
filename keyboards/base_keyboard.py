@@ -1,5 +1,7 @@
 from aiogram import types
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
+from aiogram.utils.i18n import gettext as _
+from aiogram.utils.i18n import lazy_gettext as __
 
 # types.KeyboardButton(text="Запросить геолокацию", request_location=True),
 # types.KeyboardButton(text="Запросить контакт", request_contact=True)
@@ -16,7 +18,6 @@ language = types.ReplyKeyboardMarkup(
     resize_keyboard=True
 )
 
-
 keyboard = ReplyKeyboardBuilder()
 keyboard.row(
     types.KeyboardButton(text="Вход"),
@@ -28,21 +29,23 @@ keyboard.row(
 )
 
 btn_cancel = [
-    [types.KeyboardButton(text="Отмена")]
+    [
+        types.KeyboardButton(text="Отмена"),
+        types.KeyboardButton(text='Назад')
+    ]
 ]
 cancel = types.ReplyKeyboardMarkup(
     keyboard=btn_cancel,
     resize_keyboard=True
 )
 
-
-btn_auth = [
+keyboards = [
     [
-        types.KeyboardButton(text="Авторизоватся"),
-        types.KeyboardButton(text="Отмена")
+        types.KeyboardButton(text='Отмена')
     ]
 ]
-auth = types.ReplyKeyboardMarkup(
-    keyboard=btn_auth,
+
+cancel_keyboard = types.ReplyKeyboardMarkup(
+    keyboard=keyboards,
     resize_keyboard=True
 )

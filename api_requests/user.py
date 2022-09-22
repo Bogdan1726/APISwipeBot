@@ -1,37 +1,15 @@
+from abc import ABC, abstractmethod
+from httpx import Response
 from database.requests import set_tokens, get_refresh_token
 from settings.config import HOST
 from aiogram.client.session import aiohttp
 from yarl import URL
 from database.requests import get_token, update_token, logout
-
-url = URL.build(
-    scheme='http',
-    host=HOST,
-)
+import httpx
 
 
-def header(user):
-    token = get_token(user)
-    headers = {
-        'accept': 'application/json',
-        'Authorization': 'Bearer ' + token
-    }
-    return headers
 
 
-async def login(validated_data, user_id):
-    data = {
-        'email': validated_data.get('email'),
-        'password': validated_data.get('password')
-    }
-    async with aiohttp.ClientSession() as session:
-        response = await session.post(url=url.with_path('/login/'), data=data)
-        if response.status == 200:
-            body = await response.json()
-            set_tokens(body, user_id)
-            return True
-        else:
-            return False
 
 
 async def register(validated_data):
@@ -50,36 +28,91 @@ async def register(validated_data):
             return False
 
 
-async def send_refresh_token(user):
-    async with aiohttp.ClientSession() as session:
-        token = get_refresh_token(user)
-        request = session.post(
-            url=url.with_path('/api/token/refresh/'),
-            data={"refresh": str(token)}
+class BaseApiClient(ABC):
+
+    def __init__(self, user):
+        self.user = user
+        self.url = URL.build(
+            scheme='http',
+            host=HOST,
         )
-        response = await request
-        if response.status == 200:
-            body = await response.json()
-            update_token(body, user)
-            return True
-        else:
-            logout(user)
-            return False
 
+    @abstractmethod
+    def handler_response_errors(self, response: Response) -> Response:
+        pass
 
-async def profile(user):
-    endpoint = url.with_path('/user-profile/get_profile/')
-    async with aiohttp.ClientSession() as session:
-        request = session.get(url=endpoint, headers=header(user))
-        response = await request
-        if response.status == 200:
-            body = await response.json()
-            return body
-        if response.status == 401:
-            if await send_refresh_token(user):
-                request = session.get(url=endpoint, headers=header(user))
-                response = await request
-                body = await response.json()
-                return body
+    @property
+    def client(self):
+        return httpx.Client()
+
+    async def send_refresh_token(self, request):
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                url=self.url.with_path('/api/token/refresh/'),
+                data={"refresh": get_refresh_token(self.user)}
+            )
+            if response.status_code == 200:
+                response_data = response.json()
+                token = response_data.get('access')
+                update_token(token, self.user)
+                request.headers['Authorization'] = 'Bearer ' + token
+                response = await client.send(request)
+                return response
             else:
-                return False
+                logout(self.user)
+                return response
+
+    async def send_request(self, request):
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.send(request)
+                print(response.status_code)
+                if response.status_code == 401:
+                    response = await self.send_refresh_token(request)
+            response_data = response.json()
+            return response_data
+        except Exception as error:
+            raise error
+
+
+class UserApiClient(BaseApiClient):
+
+    def handler_response_errors(self, response: Response) -> Response:
+        return response
+
+    def get_header(self) -> dict:
+        headers = {
+            'accept': 'application/json',
+            'Authorization': 'Bearer ' + get_token(self.user)
+        }
+        return headers
+
+    async def login(self, validated_data):
+        data = {
+            'email': validated_data.get('email'),
+            'password': validated_data.get('password')
+        }
+        request = self.client.build_request(method='POST',
+                                            url=str(self.url.with_path('/login/')),
+                                            data=data
+                                            )
+        response = self.send_request(request)
+        print(response)
+        return response
+
+
+            # request = await session.post(url=url.with_path('/login/'), data=data)
+            # if response.status == 200:
+            #     body = await response.json()
+            #     set_tokens(body, self.user)
+            #     return True
+            # else:
+            #     return False
+
+    async def profile(self):
+        request = self.client.build_request(method='GET',
+                                            url=self.url.with_path('/user-profile/get_profile/'),
+                                            headers=self.get_header()
+                                            )
+        response = await self.send_request(request)
+        return response

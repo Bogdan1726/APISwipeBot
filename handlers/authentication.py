@@ -1,9 +1,8 @@
-from aiogram import types, Router
-from aiogram.client.session import aiohttp
-from aiogram.filters import Command, Text
+from aiogram import Router
+from aiogram.filters import Text
 from aiogram.types import Message
-from api_requests.user import login
-from keyboards import base_keyboard, authentication_keyboard, management_keyboards
+from api_requests.user import UserApiClient
+from keyboards import management_keyboards, authentication_keyboard, base_keyboard
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
@@ -11,33 +10,35 @@ router = Router()
 
 
 class AuthenticationStates(StatesGroup):
-    write_mail = State()
-    write_password = State()
+    login = State()
+    email = State()
+    password = State()
     auth = State()
 
 
 @router.message(Text(text="Вход"))
-async def login_email(message: Message, state: FSMContext):
+@router.message(AuthenticationStates.login)
+async def login_email(message: Message, state: FSMContext) -> None:
+    await state.set_state(AuthenticationStates.email)
     await message.answer(
         "Введите e-mail:",
-        reply_markup=base_keyboard.cancel
+        reply_markup=authentication_keyboard.cancel
     )
-    await state.set_state(AuthenticationStates.write_mail)
 
 
-@router.message(AuthenticationStates.write_mail)
-async def login_password(message: Message, state: FSMContext):
+@router.message(AuthenticationStates.email)
+async def login_password(message: Message, state: FSMContext) -> None:
     await state.update_data(email=message.text.lower())
+    await state.set_state(AuthenticationStates.password)
     await message.answer(
         "Введите пароль:",
-        reply_markup=base_keyboard.cancel
+        reply_markup=authentication_keyboard.cancel
     )
-    await state.set_state(AuthenticationStates.write_password)
 
-
-@router.message(AuthenticationStates.write_password)
-async def authentication(message: Message, state: FSMContext):
+@router.message(AuthenticationStates.password)
+async def authentication(message: Message, state: FSMContext) -> None:
     await state.update_data(password=message.text)
+    await state.set_state(AuthenticationStates.auth)
     data = await state.get_data()
     await message.answer(
         f'Ваши данные для входа \n'
@@ -45,15 +46,17 @@ async def authentication(message: Message, state: FSMContext):
         f'Пароль: {data.get("password")}\n'
         f'Если все верно нажмите кнопку «Авторизоватся»\n'
         f'В противном случае нажмите «Отмена» и повторите попытку',
-        reply_markup=base_keyboard.auth
+        reply_markup=authentication_keyboard.auth
     )
-    await state.set_state(AuthenticationStates.auth)
 
 
 @router.message(Text(text="Авторизоватся"))
-async def authentication(message: Message, state: FSMContext):
+async def authentication(message: Message, state: FSMContext) -> None:
     validated_data = await state.get_data()
-    if await login(validated_data, message.from_user.id) is True:
+    user_client = UserApiClient(message.from_user.id)
+    response = await user_client.login(validated_data)
+    print(response)
+    if response:
         await message.answer(
             f'Авторизация прошла успешно\n'
             f'Добро пожаловать в Главное меню',
@@ -66,21 +69,3 @@ async def authentication(message: Message, state: FSMContext):
             f'Не забудьте убедится в правильности введенных данных',
             reply_markup=base_keyboard.keyboard.as_markup(resize_keyboard=True)
         )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
