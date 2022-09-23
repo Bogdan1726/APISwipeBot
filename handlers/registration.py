@@ -3,7 +3,7 @@ from aiogram import Router, F
 from aiogram.filters import Text
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
-from api_requests.user import register
+from api_requests.user import UserApiClient
 from keyboards import base_keyboard, registration_keyboard
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.utils.i18n import gettext as _
@@ -50,22 +50,22 @@ class RegistrationStates(StatesGroup):
     register_edit_data = State()
 
 
-@router.message(RegistrationStates.register, F.text.casefold() == 'редактировать email')
-@router.message(RegistrationStates.write_password1, F.text.casefold() == 'назад')
-@router.message(Text(text="Регистрация"))
+@router.message(RegistrationStates.register, F.text.lower() == __('редактировать email'))
+@router.message(RegistrationStates.write_password1, F.text.lower() == __('назад'))
+@router.message(F.text.lower() == __("регистрация"))
 @router.message(RegistrationStates.start_registration)
 async def register_email(message: Message, state: FSMContext):
     if message.text.casefold() == 'редактировать email':
         await state.set_state(RegistrationStates.write_last_name)
         await message.answer(
             _("Введите e-mail:"),
-            reply_markup=registration_keyboard.to_reg_data
+            reply_markup=registration_keyboard.get_back_register()
         )
     else:
         await state.set_state(RegistrationStates.write_mail)
         await message.answer(
             _("Введите e-mail:"),
-            reply_markup=base_keyboard.cancel_keyboard
+            reply_markup=base_keyboard.get_cancel_keyboard()
         )
 
 
@@ -75,7 +75,7 @@ async def register_password1(message: Message, state: FSMContext):
     if message.text.casefold() == 'назад':
         await message.answer(
             _("Укажите пароль:"),
-            reply_markup=base_keyboard.cancel
+            reply_markup=base_keyboard.get_cancel_group_keyboard()
         )
         await state.set_state(RegistrationStates.write_password1)
     else:
@@ -83,14 +83,14 @@ async def register_password1(message: Message, state: FSMContext):
         if validate_email(email) is False:
             await message.answer(
                 _('Электронная почта - имеет неверный формат, пожалуйста, введите свой адрес электронной почты еще раз'),
-                reply_markup=base_keyboard.cancel
+                reply_markup=base_keyboard.get_cancel_group_keyboard()
             )
             await state.set_state(RegistrationStates.write_mail)
         else:
             await state.update_data(email=email)
             await message.answer(
                 _("Укажите пароль:"),
-                reply_markup=base_keyboard.cancel
+                reply_markup=base_keyboard.get_cancel_group_keyboard()
             )
             await state.set_state(RegistrationStates.write_password1)
 
@@ -106,14 +106,14 @@ async def register_password2(message: Message, state: FSMContext):
               '- Содержать число \n'
               '- Содержать символ верхнего и нижнего регистра \n'
               '- Содержать минимум 8 символов'),
-            reply_markup=base_keyboard.cancel
+            reply_markup=base_keyboard.get_cancel_group_keyboard()
         )
         await state.set_state(RegistrationStates.write_password1)
     else:
         await state.update_data(password1=message.text)
         await message.answer(
             _("Повторите пароль:"),
-            reply_markup=base_keyboard.cancel
+            reply_markup=base_keyboard.get_cancel_group_keyboard()
         )
         await state.set_state(RegistrationStates.write_password2)
 
@@ -127,14 +127,14 @@ async def register_first_name(message: Message, state: FSMContext):
     if repeat_password != password:
         await message.answer(
             _('Пароли не совпадают'),
-            reply_markup=base_keyboard.cancel
+            reply_markup=base_keyboard.get_cancel_group_keyboard()
         )
         await state.set_state(RegistrationStates.write_password2)
     else:
         await state.update_data(password2=message.text)
         await message.answer(
             _("Введите имя:"),
-            reply_markup=base_keyboard.cancel
+            reply_markup=base_keyboard.get_cancel_group_keyboard()
         )
         await state.set_state(RegistrationStates.write_first_name)
 
@@ -146,14 +146,14 @@ async def register_last_name(message: Message, state: FSMContext):
     if validate_name(first_name) is False:
         await message.answer(
             _('Введенное имя некорректно'),
-            reply_markup=base_keyboard.cancel
+            reply_markup=base_keyboard.get_cancel_group_keyboard()
         )
         await state.set_state(RegistrationStates.write_first_name)
     else:
         await state.update_data(first_name=message.text)
         await message.answer(
             _("Введите фамилию:"),
-            reply_markup=base_keyboard.cancel
+            reply_markup=base_keyboard.get_cancel_group_keyboard()
         )
         await state.set_state(RegistrationStates.write_last_name)
 
@@ -178,7 +178,7 @@ async def register_last_name(message: Message, state: FSMContext):
                 last_name=html.quote(data.get('last_name')),
 
             ),
-            reply_markup=registration_keyboard.reg_keyboard
+            reply_markup=registration_keyboard.get_register_keyboard()
         )
         await state.set_state(RegistrationStates.register)
     else:
@@ -186,7 +186,7 @@ async def register_last_name(message: Message, state: FSMContext):
         if validate_name(last_name) is False:
             await message.answer(
                 _('Введенная фамилия некорректна'),
-                reply_markup=base_keyboard.cancel
+                reply_markup=base_keyboard.get_cancel_group_keyboard()
             )
             await state.set_state(RegistrationStates.write_last_name)
         else:
@@ -207,7 +207,7 @@ async def register_last_name(message: Message, state: FSMContext):
                     last_name=html.quote(data.get('last_name')),
 
                 ),
-                reply_markup=registration_keyboard.reg_keyboard
+                reply_markup=registration_keyboard.get_register_keyboard()
             )
             await state.set_state(RegistrationStates.register)
 
@@ -215,21 +215,23 @@ async def register_last_name(message: Message, state: FSMContext):
 @router.message(Text(text="Зарегистрироватся"))
 async def registration(message: Message, state: FSMContext):
     validated_data = await state.get_data()
-    if await register(validated_data) is True:
+    user_client = UserApiClient(message.from_user.id)
+    response = await user_client.register(validated_data)
+    if response:
         await message.answer(
             _('Регистрация прошла успешно, письмо с подтверждением отправлено\n'
               'на почту {email}\n'
               'Перейдите по ссылке в письме для завершения регистрации').format(
                 email=validated_data.get('email')
             ),
-            reply_markup=base_keyboard.keyboard.as_markup(resize_keyboard=True)
+            reply_markup=base_keyboard.get_base_keyboard()
         )
         await state.clear()
     else:
         await message.answer(
             _('Ошибка регистрации, попробуйте еще\n'
               'Не забудьте убедится в правильности введенных данных'),
-            reply_markup=registration_keyboard.reg_keyboard
+            reply_markup=registration_keyboard.get_register_keyboard()
         )
 
 

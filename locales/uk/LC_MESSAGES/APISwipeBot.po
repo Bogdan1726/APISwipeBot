@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-09-21 18:06+0300\n"
+"POT-Creation-Date: 2022-09-23 18:16+0300\n"
 "PO-Revision-Date: 2022-09-20 16:51+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: uk\n"
@@ -19,13 +19,60 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.10.3\n"
 
-#: handlers/base.py:32 handlers/base.py:42
-msgid "Пожалуйста войдите или зарегистрируйтесь чтобы продолжить"
-msgstr "Будь ласка, увійдіть або зареєструйтесь, щоб продовжити"
+#: handlers/authentication.py:22
+msgid "вход"
+msgstr "вхід"
 
-#: handlers/registration.py:61 handlers/registration.py:67
+#: handlers/authentication.py:27 handlers/registration.py:61
+#: handlers/registration.py:67
 msgid "Введите e-mail:"
 msgstr "Введіть e-mail:"
+
+#: handlers/authentication.py:37
+msgid "Введите пароль:"
+msgstr "Введіть пароль:"
+
+#: handlers/authentication.py:48
+msgid ""
+"Ваши данные для входа \n"
+"E-mail: {email}\n"
+"Пароль: {password}\n"
+"Если все верно нажмите кнопку «Авторизоватся»\n"
+"В противном случае нажмите «Отмена» и повторите попытку"
+msgstr ""
+"Ваші дані для входу \n"
+"E-mail: {email}\n"
+"Пароль: {password}\n"
+"Якщо все правильно натисніть кнопку «Авторизуватися»\n"
+"В іншому випадку натисніть «Скасувати» і повторіть спробу"
+
+#: handlers/authentication.py:61
+msgid "авторизоваться"
+msgstr "авторизуватися"
+
+#: handlers/authentication.py:68
+msgid ""
+"Авторизация прошла успешно\n"
+"Добро пожаловать в Главное меню"
+msgstr ""
+"Авторизація пройшла успішно\n"
+"Ласкаво просимо до Головного меню"
+
+#: handlers/authentication.py:75
+msgid ""
+"Ошибка авторизации, попробуйте еще\n"
+"Не забудьте убедится в правильности введенных данных"
+msgstr ""
+"Помилка авторизації, спробуйте ще\n"
+"Не забудьте переконатися у правильності введених даних"
+
+#: handlers/base.py:19
+msgid "к выбору языка"
+msgstr "до вибору мови"
+
+#: handlers/base.py:31 handlers/base.py:41
+msgid "Пожалуйста войдите или зарегистрируйтесь чтобы продолжить"
+msgstr "Будь ласка, увійдіть або зареєструйтесь, щоб продовжити"
 
 #: handlers/registration.py:77 handlers/registration.py:92
 msgid "Укажите пароль:"
@@ -89,7 +136,7 @@ msgstr ""
 msgid "Введенная фамилия некорректна"
 msgstr "Введене прізвище некоректне"
 
-#: handlers/registration.py:220
+#: handlers/registration.py:222
 msgid ""
 "Регистрация прошла успешно, письмо с подтверждением отправлено\n"
 "на почту {email}\n"
@@ -99,13 +146,25 @@ msgstr ""
 "на пошту {email}\n"
 "Перейдіть за посиланням у листі для завершення реєстрації"
 
-#: handlers/registration.py:230
+#: handlers/registration.py:232
 msgid ""
 "Ошибка регистрации, попробуйте еще\n"
 "Не забудьте убедится в правильности введенных данных"
 msgstr ""
 "Помилка реєстрації, спробуйте ще \n"
 "Не забудьте переконатися у правильності введених даних"
+
+#: keyboards/base_keyboard.py:10
+msgid "Вход"
+msgstr "Вхід"
+
+#: keyboards/base_keyboard.py:11
+msgid "Регистрация"
+msgstr "Реєстрація"
+
+#: keyboards/base_keyboard.py:13
+msgid "К выбору языка"
+msgstr "До вибору мови"
 
 #~ msgid "Нет такой команды"
 #~ msgstr "Немає такої команди"
@@ -115,4 +174,34 @@ msgstr ""
 
 #~ msgid "Регистрация"
 #~ msgstr "Реєстрація"
+
+#~ msgid "My menu entry"
+#~ msgstr ""
+
+#~ msgid "Авторизоватся"
+#~ msgstr "Авторизуватися"
+
+#~ msgid "К выбору языка"
+#~ msgstr "До вибору мови"
+
+#~ msgid "Взод"
+#~ msgstr "Вход"
+
+#~ msgid "Register"
+#~ msgstr "Регистрация"
+
+#~ msgid "Вход"
+#~ msgstr "Вхід"
+
+#~ msgid "Отмена"
+#~ msgstr "Cкасування"
+
+#~ msgid "вход"
+#~ msgstr "вхід"
+
+#~ msgid "Мои обьявления"
+#~ msgstr "Мої оголошення"
+
+#~ msgid "Редактировать профиль"
+#~ msgstr "Редагувати профіль"
 

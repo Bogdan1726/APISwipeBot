@@ -4,7 +4,6 @@ from middlewares.language import Localization
 from settings import config
 from handlers import base, registration, authentication, management
 from settings.config import I18N_DOMAIN, LOCALES_DIR
-import asyncio
 import logging
 import sys
 
@@ -12,7 +11,7 @@ i18n = I18n(path=LOCALES_DIR, default_locale="ru", domain=I18N_DOMAIN)
 
 bot = Bot(token=config.TOKEN)
 dp = Dispatcher()
-dp.message.middleware(Localization(i18n))
+dp.message.outer_middleware(Localization(i18n))
 
 
 def main() -> None:

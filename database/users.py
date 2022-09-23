@@ -12,4 +12,3 @@ class User(Document):
     is_authenticated = fields.BooleanField(default=False)
     language = fields.StringField(default='ru')
 
-

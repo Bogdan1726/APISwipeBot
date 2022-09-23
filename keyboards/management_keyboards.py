@@ -1,23 +1,33 @@
 from aiogram import types
-from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
-
-# ads = types.KeyboardButton(text="Объявления"),
-# profile = types.KeyboardButton(text="Профиль")
-# logout = types.KeyboardButton(text='Выход')
-
-menu = ReplyKeyboardBuilder()
-menu.row(
-    types.KeyboardButton(text="Объявления"),
-    types.KeyboardButton(text="Профиль")
-)
-menu.row(types.KeyboardButton(text='Выход'))
+from aiogram.utils.i18n import gettext as _
+from aiogram.utils.i18n import lazy_gettext as __
 
 
-profile_buttons = [
-    [
-        types.InlineKeyboardButton(text='Мои обьявления', callback_data="num_decr"),
-        types.InlineKeyboardButton(text='Редактировать профиль', callback_data="num_dec")
+def get_main_menu_keyboard():
+    buttons = [
+        [
+            types.KeyboardButton(text=str(_("Объявления"))),
+            types.KeyboardButton(text=str(_("Профиль")))
+        ],
+        [types.KeyboardButton(text=str(_('Выход')))]
     ]
-]
-profile = types.InlineKeyboardMarkup(inline_keyboard=profile_buttons)
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=buttons,
+        resize_keyboard=True
+    )
+    return keyboard
 
+
+def get_profile_keyboard():
+    buttons = [
+        [
+            types.KeyboardButton(text=str(_("Мои обьявления"))),
+            types.KeyboardButton(text=str(_("Редактировать профиль")))
+        ],
+        [types.KeyboardButton(text=str(_('Назад в Главное меню')))]
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=buttons,
+        resize_keyboard=True
+    )
+    return keyboard

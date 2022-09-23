@@ -50,3 +50,11 @@ def get_token(user_id):
 def get_refresh_token(user_id) -> str:
     user = User.objects(user=user_id).first()
     return user.refresh_token
+
+
+def get_language(language_code):
+    language = Language.objects(language=language_code).first()
+    return language
+
+
+

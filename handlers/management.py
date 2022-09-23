@@ -8,14 +8,14 @@ from keyboards import base_keyboard, authentication_keyboard, management_keyboar
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.utils.markdown import hide_link
+from aiogram.utils.i18n import gettext as _
+from aiogram import html
+from aiogram.utils.i18n import lazy_gettext as __
+
+from settings.config import HOST
 
 router = Router()
 
-
-# class AuthenticationStates(StatesGroup):
-#     write_mail = State()
-#     write_password = State()
-#     auth = State()
 
 # region profile
 
@@ -26,36 +26,23 @@ async def user_profile(message: Message, state: FSMContext):
     if is_authenticated(user):
         data = await user_client.profile()
         await message.answer(
-            f'Имя: {data.get("first_name")}\n'
-            f'Фамилия: {data.get("last_name")}\n'
-            f'Телефон: {data.get("phone") if data.get("phone") else "Нет даных"}\n'
-            f'E-mail: {data.get("email")}',
-            reply_markup=management_keyboards.profile
+            _('Avatar: {logo}\n'
+              'Имя: {first_name}\n'
+              'Фамилия: {last_name}\n'
+              'Телефон: {phone}\n'
+              'E-mail: {email}').format(
+                first_name=html.quote(data.get('first_name')),
+                last_name=html.quote(data.get('last_name')),
+                phone=html.quote(data.get('phone')) if data.get('phone') else "Нет даных",
+                email=html.quote(data.get('email')),
+                logo=hide_link(str('http://137.184.201.122' + data.get('profile_image'))),
+            ), parse_mode="HTML",
+            reply_markup=management_keyboards.get_profile_keyboard()
         )
     else:
         await message.answer(
             'Пожалуйста войдите или зарегистрируйтесь чтобы продолжить',
-            reply_markup=base_keyboard.keyboard.as_markup(resize_keyboard=True)
+            reply_markup=base_keyboard.get_base_keyboard()
         )
-
-# @router.message(Text(text="Объявления"))
-# async def user_profile(message: Message, state: FSMContext):
-#     user = message.from_user.id
-#     user_client = UserApiClient(user)
-#     if is_authenticated(user):
-#         if await user_client.profile():
-#         data = await user_client.profile()
-#         await message.answer(
-#             f'Имя: {data.get("first_name")}\n'
-#             f'Фамилия: {data.get("last_name")}\n'
-#             f'Телефон: {data.get("phone") if data.get("phone") else "Нет даных"}\n'
-#             f'E-mail: {data.get("email")}',
-#             reply_markup=management_keyboards.profile
-#         )
-#     else:
-#         await message.answer(
-#             'Пожалуйста войдите или зарегистрируйтесь чтобы продолжить',
-#             reply_markup=base_keyboard.keyboard.as_markup(resize_keyboard=True)
-#         )
 
 # endregion profile

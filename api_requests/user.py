@@ -8,26 +8,6 @@ from database.requests import get_token, update_token, logout
 import httpx
 
 
-
-
-
-
-async def register(validated_data):
-    data = {
-        'email': validated_data.get('email'),
-        'password1': validated_data.get('password1'),
-        'password2': validated_data.get('password2'),
-        'first_name': validated_data.get('first_name'),
-        'last_name': validated_data.get('last_name')
-    }
-    async with aiohttp.ClientSession() as session:
-        response = await session.post(url=url.with_path('/registration/'), data=data)
-        if response.status == 201:
-            return True
-        else:
-            return False
-
-
 class BaseApiClient(ABC):
 
     def __init__(self, user):
@@ -48,7 +28,7 @@ class BaseApiClient(ABC):
     async def send_refresh_token(self, request):
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                url=self.url.with_path('/api/token/refresh/'),
+                url=str(self.url.with_path('/api/token/refresh/')),
                 data={"refresh": get_refresh_token(self.user)}
             )
             if response.status_code == 200:
@@ -66,11 +46,9 @@ class BaseApiClient(ABC):
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.send(request)
-                print(response.status_code)
                 if response.status_code == 401:
                     response = await self.send_refresh_token(request)
-            response_data = response.json()
-            return response_data
+            return response
         except Exception as error:
             raise error
 
@@ -87,6 +65,24 @@ class UserApiClient(BaseApiClient):
         }
         return headers
 
+    async def register(self, validated_data):
+        data = {
+            'email': validated_data.get('email'),
+            'password1': validated_data.get('password1'),
+            'password2': validated_data.get('password2'),
+            'first_name': validated_data.get('first_name'),
+            'last_name': validated_data.get('last_name')
+        }
+        request = self.client.build_request(method='POST',
+                                            url=str(self.url.with_path('/registration/')),
+                                            data=data
+                                            )
+        response = await self.send_request(request)
+        if response.status_code == 201:
+            return True
+        else:
+            return False
+
     async def login(self, validated_data):
         data = {
             'email': validated_data.get('email'),
@@ -96,23 +92,17 @@ class UserApiClient(BaseApiClient):
                                             url=str(self.url.with_path('/login/')),
                                             data=data
                                             )
-        response = self.send_request(request)
-        print(response)
-        return response
-
-
-            # request = await session.post(url=url.with_path('/login/'), data=data)
-            # if response.status == 200:
-            #     body = await response.json()
-            #     set_tokens(body, self.user)
-            #     return True
-            # else:
-            #     return False
+        response = await self.send_request(request)
+        if response.status_code == 200:
+            set_tokens(response.json(), self.user)
+            return True
+        else:
+            return False
 
     async def profile(self):
         request = self.client.build_request(method='GET',
-                                            url=self.url.with_path('/user-profile/get_profile/'),
+                                            url=str(self.url.with_path('/user-profile/get_profile/')),
                                             headers=self.get_header()
                                             )
         response = await self.send_request(request)
-        return response
+        return response.json()
