@@ -1,19 +1,14 @@
 from aiogram import Router, F
 from aiogram.filters import Command
-from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from database.requests import is_authenticated, logout
 from keyboards import base_keyboard
 from aiogram.utils.i18n import gettext as _
 from aiogram.utils.i18n import lazy_gettext as __
+from settings.states import BaseStates
 
 router = Router()
-
-
-class BaseStates(StatesGroup):
-    start = State()
-    language = State()
 
 
 @router.message(Command(commands=["start"]))

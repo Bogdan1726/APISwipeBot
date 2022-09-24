@@ -105,4 +105,48 @@ class UserApiClient(BaseApiClient):
                                             headers=self.get_header()
                                             )
         response = await self.send_request(request)
-        return response.json()
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return False
+
+    async def profile_update(self, validated_data):
+        data = {
+            'email': validated_data.get('email'),
+            'phone': validated_data.get('phone'),
+            'first_name': validated_data.get('first_name'),
+            'last_name': validated_data.get('last_name')
+        }
+        request = self.client.build_request(method='PUT',
+                                            url=str(self.url.with_path('/user-profile/update_profile/')),
+                                            headers=self.get_header(),
+                                            data=data)
+        request.headers['Content-Type'] = 'multipart/form-data'
+        response = await self.send_request(request)
+        print(response.json())
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return False
+
+        # curl - X
+        # 'PUT' \
+        # 'http://137.184.201.122/user-profile/update_profile/' \
+        # - H
+        # 'accept: application/json' \
+        # - H
+        # 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjY0MDQ4MTgxLCJpYXQiOjE2NjQwNDgxMjEsImp0aSI6ImFiNjI3OWQ5NzU3YjRkNjdhMTJlYmM1YzExMWM5YTc2IiwidXNlcl9pZCI6MTF9.ewpd2Qjqd8LMy4nhk8jwsXlkb5QikhCzxNIIHaclxhg' \
+        # - H
+        # 'Content-Type: multipart/form-data' \
+        # - H
+        # 'X-CSRFTOKEN: HlNzABdqHEvDfj026i5BgKwHNYJWcjEJcZvIfKoYRM5f1XRwqcwnKgYOkJjsvqND' \
+        # - F
+        # 'first_name=Богдан' \
+        # - F
+        # 'last_name=Рожнятовский' \
+        # - F
+        # 'phone=+380939804334' \
+        # - F
+        # 'email=admin@admin.com' \
+        # - F
+        # 'profile_image='

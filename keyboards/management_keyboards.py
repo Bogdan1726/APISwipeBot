@@ -31,3 +31,38 @@ def get_profile_keyboard():
         resize_keyboard=True
     )
     return keyboard
+
+
+def get_profile_edit_keyboard():
+    buttons = [
+        [
+            types.KeyboardButton(text=str(_("Редактировать email"))),
+            types.KeyboardButton(text=str(_("Редактировать телефон")))
+        ],
+        [
+            types.KeyboardButton(text=str(_("Редактировать имя"))),
+            types.KeyboardButton(text=str(_("Редактировать фамилию"))),
+        ],
+        [
+            types.KeyboardButton(text=str(_('Назад в Профиль')))
+        ]
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=buttons,
+        resize_keyboard=True
+    )
+    return keyboard
+
+
+def get_cancel_keyboard():
+    buttons = [
+        [
+            types.KeyboardButton(text=str(_('Отменить редактирование')))
+        ]
+    ]
+
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=buttons,
+        resize_keyboard=True
+    )
+    return keyboard
