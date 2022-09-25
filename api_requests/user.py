@@ -111,16 +111,9 @@ class UserApiClient(BaseApiClient):
             return False
 
     async def profile_update(self, validated_data):
-        data = {
-            'email': validated_data.get('email'),
-            'phone': validated_data.get('phone'),
-            'first_name': validated_data.get('first_name'),
-            'last_name': validated_data.get('last_name')
-        }
         request = self.client.build_request(method='PUT',
                                             url=str(self.url.with_path('/user-profile/update_profile/')),
-                                            headers=self.get_header(),
-                                            data=data)
+                                            headers=self.get_header())
         request.headers['Content-Type'] = 'multipart/form-data'
         response = await self.send_request(request)
         print(response.json())
