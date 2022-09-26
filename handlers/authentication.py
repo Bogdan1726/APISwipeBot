@@ -3,19 +3,12 @@ from aiogram.types import Message
 from api_requests.user import UserApiClient
 from keyboards import management_keyboards, authentication_keyboard, base_keyboard
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import StatesGroup, State
 from aiogram.utils.i18n import gettext as _
 from aiogram import html
 from aiogram.utils.i18n import lazy_gettext as __
+from settings.states import AuthenticationStates
 
 router = Router()
-
-
-class AuthenticationStates(StatesGroup):
-    login = State()
-    email = State()
-    password = State()
-    auth = State()
 
 
 @router.message(F.text.lower() == __("вход"))

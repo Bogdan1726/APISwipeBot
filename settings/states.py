@@ -16,3 +16,24 @@ class ProfileStates(StatesGroup):
     first_name = State()
     last_name = State()
 
+
+class RegistrationStates(StatesGroup):
+    start_registration = State()
+    write_mail = State()
+    write_password1 = State()
+    write_password2 = State()
+    write_first_name = State()
+    write_last_name = State()
+    register = State()
+    register_edit_data = State()
+    edit_email = State()
+    edit_password = State()
+    edit_first_name = State()
+    edit_last_name = State()
+
+
+class AuthenticationStates(StatesGroup):
+    login = State()
+    email = State()
+    password = State()
+    auth = State()
