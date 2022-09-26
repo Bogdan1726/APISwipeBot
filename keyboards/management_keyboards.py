@@ -66,3 +66,16 @@ def get_cancel_keyboard():
         resize_keyboard=True
     )
     return keyboard
+
+
+def get_profile_cancel():
+    buttons = [
+        [
+            types.KeyboardButton(text=str(_('Назад в Профиль')))
+        ]
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=buttons,
+        resize_keyboard=True
+    )
+    return keyboard

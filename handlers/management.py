@@ -1,5 +1,7 @@
 from aiogram import Router, F
 from aiogram.types import Message
+from aiogram.utils.markdown import hide_link
+
 from api_requests.user import UserApiClient
 from database.requests import is_authenticated
 from keyboards import base_keyboard, management_keyboards
@@ -43,6 +45,41 @@ async def user_profile(message: Message, state: FSMContext):
                 _('Пожалуйста войдите или зарегистрируйтесь чтобы продолжить'),
                 reply_markup=base_keyboard.get_base_keyboard())
             await state.set_state(BaseStates.start)
+    else:
+        await state.set_state(BaseStates.language)
+
+
+@router.message(F.text.lower() == __("мои обьявления"))
+@router.message(F.text.lower() == __("назад в профиль"))
+async def user_ads(message: Message, state: FSMContext):
+    user = message.from_user.id
+    user_client = UserApiClient(user)
+    if is_authenticated(user):
+        data = await user_client.user_ads()
+        if data:
+            for ads in data:
+                await message.answer(
+                    _("<a href='{url}'>&#8203;</a>"
+                      "Адрес - {address}\n"
+                      "Площадь - {area} кв.м\n"
+                      "Количество комнат - {rooms}\n"
+                      "{test}"
+                      "Цена - {price} грн\n").format(
+                        address=html.code(ads.get('address')),
+                        area=ads.get('area'),
+                        rooms=ads.get('rooms'),
+                        price=ads.get('price'),
+                        test=ads.get('preview_image'),
+                        url='https://137.184.201.122/media/images/ads/gallery/announcements/Background_1.png'
+                    ), parse_mode="HTML",
+                    reply_markup=management_keyboards.get_profile_cancel()
+                )
+        else:
+            await message.answer(
+                _('У вас нет ни одного объявления!'),
+                reply_markup=management_keyboards.get_profile_cancel()
+            )
+        await state.set_state(ProfileStates.ads)
     else:
         await state.set_state(BaseStates.language)
 

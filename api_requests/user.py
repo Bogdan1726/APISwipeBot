@@ -35,8 +35,6 @@ class BaseApiClient(ABC):
                 response_data = response.json()
                 token = response_data.get('access')
                 update_token(token, self.user)
-                request.headers['Authorization'] = 'Bearer ' + token
-                response = await client.send(request)
                 return response
             else:
                 logout(self.user)
@@ -48,6 +46,10 @@ class BaseApiClient(ABC):
                 response = await client.send(request)
                 if response.status_code == 401:
                     response = await self.send_refresh_token(request)
+                    response_data = response.json()
+                    if 'access' in response_data:
+                        request.headers['Authorization'] = 'Bearer ' + response_data['access']
+                        response = await client.send(request)
             return response
         except Exception as error:
             raise error
@@ -105,12 +107,16 @@ class UserApiClient(BaseApiClient):
                                             headers=self.get_header()
                                             )
         response = await self.send_request(request)
+        print(response)
         if response.status_code == 200:
             return response.json()
         else:
             return False
 
     async def profile_update(self, validated_data):
+        data = {
+            "first_name": b'Test'
+        }
         request = self.client.build_request(method='PUT',
                                             url=str(self.url.with_path('/user-profile/update_profile/')),
                                             headers=self.get_header())
@@ -122,24 +128,13 @@ class UserApiClient(BaseApiClient):
         else:
             return False
 
-        # curl - X
-        # 'PUT' \
-        # 'http://137.184.201.122/user-profile/update_profile/' \
-        # - H
-        # 'accept: application/json' \
-        # - H
-        # 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjY0MDQ4MTgxLCJpYXQiOjE2NjQwNDgxMjEsImp0aSI6ImFiNjI3OWQ5NzU3YjRkNjdhMTJlYmM1YzExMWM5YTc2IiwidXNlcl9pZCI6MTF9.ewpd2Qjqd8LMy4nhk8jwsXlkb5QikhCzxNIIHaclxhg' \
-        # - H
-        # 'Content-Type: multipart/form-data' \
-        # - H
-        # 'X-CSRFTOKEN: HlNzABdqHEvDfj026i5BgKwHNYJWcjEJcZvIfKoYRM5f1XRwqcwnKgYOkJjsvqND' \
-        # - F
-        # 'first_name=Богдан' \
-        # - F
-        # 'last_name=Рожнятовский' \
-        # - F
-        # 'phone=+380939804334' \
-        # - F
-        # 'email=admin@admin.com' \
-        # - F
-        # 'profile_image='
+    async def user_ads(self):
+        request = self.client.build_request(method='GET',
+                                            url=str(self.url.with_path('/ads/announcement-feed/get_my_announcement/')),
+                                            headers=self.get_header())
+        response = await self.send_request(request)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return False
+
