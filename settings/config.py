@@ -23,3 +23,5 @@ DB_NAME = str(os.getenv('DB_NAME'))
 I18N_DOMAIN = 'APISwipeBot'
 LOCALES_DIR = 'locales'
 # endregion language
+
+DEFAULT_IMAGE = "https://st4.depositphotos.com/14953852/22772/v/600/depositphotos_227725052-stock-illustration-no-image-available-icon-flat.jpg"

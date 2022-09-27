@@ -1,7 +1,7 @@
-from aiogram import Router, F
-from aiogram.types import Message
-from aiogram.utils.markdown import hide_link
-
+from aiogram import Router, F, Bot
+from aiogram.filters import Text
+from aiogram.types import Message, URLInputFile, CallbackQuery
+from yarl import URL
 from api_requests.user import UserApiClient
 from database.requests import is_authenticated
 from keyboards import base_keyboard, management_keyboards
@@ -9,14 +9,37 @@ from aiogram.fsm.context import FSMContext
 from aiogram.utils.i18n import gettext as _
 from aiogram import html
 from aiogram.utils.i18n import lazy_gettext as __
+
+from settings.config import HOST, DEFAULT_IMAGE
 from settings.states import ProfileStates, BaseStates
-from settings.validators import validate_email, validate_name, validate_phone
+from settings.validators import validate_email, validate_name, validate_phone, validate_image
 
 router = Router()
 
+domain = URL.build(
+    scheme='http',
+    host=HOST,
+)
+
+
+# region image
+
+def get_image(path=None):
+    """
+    return default image if path is None
+    """
+    image = URLInputFile(
+        DEFAULT_IMAGE,
+        filename="image")
+    if path:
+        image.url = str(domain) + str(path)
+    return image
+
+
+# endregion image
+
 
 # region profile
-
 
 @router.message(F.text.lower() == __("профиль"))
 @router.message(F.text.lower() == __("назад в профиль"))
@@ -26,7 +49,9 @@ async def user_profile(message: Message, state: FSMContext):
     if is_authenticated(user):
         data = await user_client.profile()
         if data:
-            await message.answer(
+            await message.answer_photo(
+                photo=get_image(data.get('profile_image')),
+                caption=
                 _('Имя: {first_name}\n'
                   'Фамилия: {last_name}\n'
                   'Телефон: {phone}\n'
@@ -49,6 +74,8 @@ async def user_profile(message: Message, state: FSMContext):
         await state.set_state(BaseStates.language)
 
 
+# region ads
+
 @router.message(F.text.lower() == __("мои обьявления"))
 @router.message(F.text.lower() == __("назад в профиль"))
 async def user_ads(message: Message, state: FSMContext):
@@ -58,22 +85,23 @@ async def user_ads(message: Message, state: FSMContext):
         data = await user_client.user_ads()
         if data:
             for ads in data:
-                await message.answer(
-                    _("<a href='{url}'>&#8203;</a>"
-                      "Адрес - {address}\n"
+                await message.answer_photo(
+                    photo=get_image(path=ads.get('preview_image')),
+                    caption=
+                    _("Адрес - {address}\n"
                       "Площадь - {area} кв.м\n"
                       "Количество комнат - {rooms}\n"
-                      "{test}"
                       "Цена - {price} грн\n").format(
-                        address=html.code(ads.get('address')),
+                        address=ads.get('address'),
                         area=ads.get('area'),
                         rooms=ads.get('rooms'),
                         price=ads.get('price'),
-                        test=ads.get('preview_image'),
-                        url='https://137.184.201.122/media/images/ads/gallery/announcements/Background_1.png'
                     ), parse_mode="HTML",
-                    reply_markup=management_keyboards.get_profile_cancel()
+                    reply_markup=management_keyboards.get_edit_ads_keyboard(pk=ads.get('id'))
                 )
+            await message.answer(
+                text='Test', reply_markup=management_keyboards.get_profile_cancel()
+            )
         else:
             await message.answer(
                 _('У вас нет ни одного объявления!'),
@@ -82,6 +110,15 @@ async def user_ads(message: Message, state: FSMContext):
         await state.set_state(ProfileStates.ads)
     else:
         await state.set_state(BaseStates.language)
+
+
+@router.callback_query(Text(text_startswith="edit_ads_"))
+async def send_random_value(callback: CallbackQuery):
+    print(callback.data.split('_')[2])
+    await callback.message.answer(f'{callback.message}')
+
+
+# endregion ads
 
 
 @router.message(F.text.casefold() == __("отменить редактирование"))
@@ -127,6 +164,14 @@ async def select_field(message: Message, state: FSMContext):
             reply_markup=management_keyboards.get_cancel_keyboard()
         )
         await state.set_state(ProfileStates.last_name)
+    elif text.lower() == __("установить новое фото профиля"):
+        await message.answer(
+            _("Прикрепите новое фото в сообщении\n"
+              "Рекомендуемый размер: (300x300)\n"
+              "И не более 20 мегабайт"),
+            reply_markup=management_keyboards.get_cancel_keyboard()
+        )
+        await state.set_state(ProfileStates.photo)
     else:
         await message.answer(
             _('Я не знаю такой команды, попробуйте еще раз!')
@@ -146,6 +191,19 @@ async def edit_email(message: Message, state: FSMContext):
     else:
         await state.update_data(email=email)
         data = await state.get_data()
+        user_client = UserApiClient(message.from_user.id)
+        if await user_client.profile_update(data):
+            await message.answer(
+                _('Электронная почта успешно изменена'),
+                reply_markup=management_keyboards.get_profile_edit_keyboard()
+            )
+            await state.set_state(ProfileStates.edit_profile)
+        else:
+            await message.answer(
+                _('Возникла ошибка при попытке изменить электронную почту'),
+                reply_markup=management_keyboards.get_profile_edit_keyboard()
+            )
+            await state.set_state(ProfileStates.edit_profile)
 
 
 @router.message(ProfileStates.phone)
@@ -160,6 +218,19 @@ async def edit_phone(message: Message, state: FSMContext):
     else:
         await state.update_data(phone=phone)
         data = await state.get_data()
+        user_client = UserApiClient(message.from_user.id)
+        if await user_client.profile_update(data):
+            await message.answer(
+                _('Номер телефона успешно изменен'),
+                reply_markup=management_keyboards.get_profile_edit_keyboard()
+            )
+            await state.set_state(ProfileStates.edit_profile)
+        else:
+            await message.answer(
+                _('Возникла ошибка при попытке изменить номер телефона'),
+                reply_markup=management_keyboards.get_profile_edit_keyboard()
+            )
+            await state.set_state(ProfileStates.edit_profile)
 
 
 @router.message(ProfileStates.first_name)
@@ -175,7 +246,18 @@ async def edit_first_name(message: Message, state: FSMContext):
         await state.update_data(first_name=first_name)
         data = await state.get_data()
         user_client = UserApiClient(message.from_user.id)
-        await user_client.profile_update(data)
+        if await user_client.profile_update(data):
+            await message.answer(
+                _('Имя успешно изменено'),
+                reply_markup=management_keyboards.get_profile_edit_keyboard()
+            )
+            await state.set_state(ProfileStates.edit_profile)
+        else:
+            await message.answer(
+                _('Возникла ошибка при попытке изменить имя'),
+                reply_markup=management_keyboards.get_profile_edit_keyboard()
+            )
+            await state.set_state(ProfileStates.edit_profile)
 
 
 @router.message(ProfileStates.last_name)
@@ -190,5 +272,53 @@ async def edit_last_name(message: Message, state: FSMContext):
     else:
         await state.update_data(last_name=last_name)
         data = await state.get_data()
+        user_client = UserApiClient(message.from_user.id)
+        if await user_client.profile_update(data):
+            await message.answer(
+                _('Фамилия успешно изменена'),
+                reply_markup=management_keyboards.get_profile_edit_keyboard()
+            )
+            await state.set_state(ProfileStates.edit_profile)
+        else:
+            await message.answer(
+                _('Возникла ошибка при попытке изменить фамилию'),
+                reply_markup=management_keyboards.get_profile_edit_keyboard()
+            )
+            await state.set_state(ProfileStates.edit_profile)
+
+
+@router.message(ProfileStates.photo)
+async def edit_photo(message: Message, state: FSMContext, bot: Bot):
+    try:
+        photo = message.photo[-1]
+        if validate_image(photo) is False:
+            await message.answer(
+                _('Фото превышает рекомендуемый размер')
+            )
+        else:
+            file = await bot.get_file(photo.file_id)
+            file_path = file.file_path
+            print(file_path)
+
+            # await state.update_data(profile_image=file.file_path)
+            # data = await state.get_data()
+            # user_client = UserApiClient(message.from_user.id)
+            # if await user_client.profile_update(data):
+            #     await message.answer(
+            #         _('Фото профиля успешно изменено'),
+            #         reply_markup=management_keyboards.get_profile_edit_keyboard()
+            #     )
+            #     await state.set_state(ProfileStates.edit_profile)
+            # else:
+            #     await message.answer(
+            #         _('Возникла ошибка при попытке изменить фото профиля'),
+            #         reply_markup=management_keyboards.get_profile_edit_keyboard()
+            #     )
+            #     await state.set_state(ProfileStates.edit_profile)
+    except TypeError:
+        await message.answer(
+            _('Недопустимый формат фотографии'),
+            reply_markup=management_keyboards.get_cancel_keyboard()
+        )
 
 # endregion profile

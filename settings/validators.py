@@ -30,3 +30,7 @@ def validate_phone(value: str) -> bool:
     return True
 
 
+def validate_image(value) -> bool:
+    if value.height > 300 or value.width > 300 or value.file_size > 19900000:
+        return False
+    return True

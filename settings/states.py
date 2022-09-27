@@ -15,6 +15,7 @@ class ProfileStates(StatesGroup):
     phone = State()
     first_name = State()
     last_name = State()
+    photo = State()
 
 
 class RegistrationStates(StatesGroup):
