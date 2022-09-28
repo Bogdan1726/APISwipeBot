@@ -1,3 +1,4 @@
+import os
 from aiogram import Router, F, Bot
 from aiogram.filters import Text
 from aiogram.types import Message, URLInputFile, CallbackQuery
@@ -9,7 +10,6 @@ from aiogram.fsm.context import FSMContext
 from aiogram.utils.i18n import gettext as _
 from aiogram import html
 from aiogram.utils.i18n import lazy_gettext as __
-
 from settings.config import HOST, DEFAULT_IMAGE
 from settings.states import ProfileStates, BaseStates
 from settings.validators import validate_email, validate_name, validate_phone, validate_image
@@ -74,56 +74,8 @@ async def user_profile(message: Message, state: FSMContext):
         await state.set_state(BaseStates.language)
 
 
-# region ads
-
-@router.message(F.text.lower() == __("мои обьявления"))
-@router.message(F.text.lower() == __("назад в профиль"))
-async def user_ads(message: Message, state: FSMContext):
-    user = message.from_user.id
-    user_client = UserApiClient(user)
-    if is_authenticated(user):
-        data = await user_client.user_ads()
-        if data:
-            for ads in data:
-                await message.answer_photo(
-                    photo=get_image(path=ads.get('preview_image')),
-                    caption=
-                    _("Адрес - {address}\n"
-                      "Площадь - {area} кв.м\n"
-                      "Количество комнат - {rooms}\n"
-                      "Цена - {price} грн\n").format(
-                        address=ads.get('address'),
-                        area=ads.get('area'),
-                        rooms=ads.get('rooms'),
-                        price=ads.get('price'),
-                    ), parse_mode="HTML",
-                    reply_markup=management_keyboards.get_edit_ads_keyboard(pk=ads.get('id'))
-                )
-            await message.answer(
-                text='Test', reply_markup=management_keyboards.get_profile_cancel()
-            )
-        else:
-            await message.answer(
-                _('У вас нет ни одного объявления!'),
-                reply_markup=management_keyboards.get_profile_cancel()
-            )
-        await state.set_state(ProfileStates.ads)
-    else:
-        await state.set_state(BaseStates.language)
-
-
-@router.callback_query(Text(text_startswith="edit_ads_"))
-async def send_random_value(callback: CallbackQuery):
-    print(callback.data.split('_')[2])
-    await callback.message.answer(f'{callback.message}')
-
-
-# endregion ads
-
-
-@router.message(F.text.casefold() == __("отменить редактирование"))
 @router.message(F.text.lower() == __("редактировать профиль"))
-@router.message(ProfileStates.profile)
+@router.message(F.text.lower() == __("отменить редактирование"))
 async def user_profile_edit(message: Message, state: FSMContext):
     user = message.from_user.id
     if is_authenticated(user):
@@ -297,28 +249,89 @@ async def edit_photo(message: Message, state: FSMContext, bot: Bot):
             )
         else:
             file = await bot.get_file(photo.file_id)
-            file_path = file.file_path
-            print(file_path)
-
-            # await state.update_data(profile_image=file.file_path)
-            # data = await state.get_data()
-            # user_client = UserApiClient(message.from_user.id)
-            # if await user_client.profile_update(data):
-            #     await message.answer(
-            #         _('Фото профиля успешно изменено'),
-            #         reply_markup=management_keyboards.get_profile_edit_keyboard()
-            #     )
-            #     await state.set_state(ProfileStates.edit_profile)
-            # else:
-            #     await message.answer(
-            #         _('Возникла ошибка при попытке изменить фото профиля'),
-            #         reply_markup=management_keyboards.get_profile_edit_keyboard()
-            #     )
-            #     await state.set_state(ProfileStates.edit_profile)
+            filename, file_extension = os.path.splitext(file.file_path)
+            src = 'files/' + file.file_id + file_extension
+            await bot.download_file(file_path=file.file_path, destination=src)
+            await state.update_data(profile_image_src=src)
+            data = await state.get_data()
+            user_client = UserApiClient(message.from_user.id)
+            if await user_client.profile_update(data):
+                await message.answer(
+                    _('Фото профиля успешно изменено'),
+                    reply_markup=management_keyboards.get_profile_edit_keyboard()
+                )
+                await state.set_state(ProfileStates.edit_profile)
+            else:
+                await message.answer(
+                    _('Возникла ошибка при попытке изменить фото профиля'),
+                    reply_markup=management_keyboards.get_profile_edit_keyboard()
+                )
+                await state.set_state(ProfileStates.edit_profile)
     except TypeError:
         await message.answer(
             _('Недопустимый формат фотографии'),
             reply_markup=management_keyboards.get_cancel_keyboard()
         )
 
+
 # endregion profile
+
+
+# region ads
+
+@router.message(F.text.lower() == __("мои обьявления"))
+@router.message(F.text.lower() == __('назад в мои обьявления'))
+async def user_ads(message: Message, state: FSMContext):
+    user = message.from_user.id
+    user_client = UserApiClient(user)
+    if is_authenticated(user):
+        data = await user_client.user_ads()
+        if data:
+            for ads in data:
+                await message.answer_photo(
+                    photo=get_image(path=ads.get('preview_image')),
+                    caption=
+                    _("{purpose}\n"
+                      "Адрес - {address}\n"
+                      "Площадь - {area} кв.м\n"
+                      "Планировка - {layout}\n"
+                      "Количество комнат - {rooms}\n"
+                      "Жилое состояние - {condition}\n"
+                      "Цена - {price} грн\n"
+                      "{description}\n").format(
+                        address=ads.get('address'),
+                        area=ads.get('area'),
+                        rooms=ads.get('rooms'),
+                        price=ads.get('price'),
+                        purpose=html.bold(ads.get('purpose')),
+                        layout=ads.get('layout'),
+                        condition=ads.get('condition'),
+                        description=html.italic(ads.get('description'))
+                    ), parse_mode="HTML",
+                    reply_markup=management_keyboards.get_edit_ads_keyboard(pk=ads.get('id'))
+                )
+            await message.answer(
+                text=_('Чтобы отредактировать объявление, нажмите кнопку рядом с нужным вам объявлением'),
+                reply_markup=management_keyboards.get_profile_cancel()
+            )
+            await state.set_state(ProfileStates.ads)
+        else:
+            await message.answer(
+                _('У вас нет ни одного объявления!'),
+                reply_markup=management_keyboards.get_profile_cancel()
+            )
+        await state.set_state(ProfileStates.ads)
+    else:
+        await state.set_state(BaseStates.language)
+
+
+@router.callback_query(text_startswith="edit_ads_")
+async def edit_ads(callback: CallbackQuery, bot: Bot):
+    pk = callback.data.split('_')[2]
+    await callback.message.answer(
+        f'{bot.context}'
+    )
+
+
+
+# endregion ads

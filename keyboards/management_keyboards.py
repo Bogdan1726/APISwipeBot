@@ -85,6 +85,34 @@ def get_profile_cancel():
     return keyboard
 
 
+def get_profile_edit_ads():
+    buttons = [
+        [
+            types.KeyboardButton(text=str("адрес")),
+            types.KeyboardButton(text=str("описание")),
+            types.KeyboardButton(text=str("стоимость"))
+        ],
+        [
+            types.KeyboardButton(text=str("общая площадь")),
+            types.KeyboardButton(text=str("площадь кухни")),
+            types.KeyboardButton(text=str("планировка"))
+        ],
+        [
+            types.KeyboardButton(text=str('вид права')),
+            types.KeyboardButton(text=str('количество комнат')),
+            types.KeyboardButton(text=str('жилое состояние'))
+        ],
+        [
+            types.KeyboardButton(text=str('назад в Мои обьявления'))
+        ]
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=buttons,
+        resize_keyboard=True
+    )
+    return keyboard
+
+
 def get_edit_ads_keyboard(pk):
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(

@@ -10,6 +10,7 @@ class ProfileStates(StatesGroup):
     profile = State()
     edit_profile = State()
     ads = State()
+    edit_ads = State()
     edit_fields = State()
     email = State()
     phone = State()

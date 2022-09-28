@@ -114,22 +114,22 @@ class UserApiClient(BaseApiClient):
             return False
 
     async def profile_update(self, validated_data):
-        profile_image_path = validated_data.get('profile_image') or None
+        profile_image_path = validated_data.get('profile_image_src') or None
         data = {
             'email': validated_data.get('email'),
             'first_name': validated_data.get('first_name'),
             'last_name': validated_data.get('last_name'),
             'phone': validated_data.get('phone'),
         }
-
         request = self.client.build_request(method='PUT',
                                             url=str(self.url.with_path('/user-profile/update_profile/')),
                                             headers=self.get_header(),
                                             data=data,
-                                            files={'profile_image': open(profile_image_path, 'rb')})
+                                            files={
+                                                'profile_image': open(profile_image_path, 'rb')
+                                            } if profile_image_path is not None else {})
 
         response = await self.send_request(request)
-        print(response.json())
         if response.status_code == 200:
             return response.json()
         else:
