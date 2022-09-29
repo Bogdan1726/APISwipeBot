@@ -26,7 +26,7 @@ class BaseApiClient(ABC):
     def client(self):
         return httpx.Client()
 
-    async def send_refresh_token(self, request):
+    async def send_refresh_token(self):
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 url=str(self.url.with_path('/api/token/refresh/')),
@@ -46,7 +46,7 @@ class BaseApiClient(ABC):
             async with httpx.AsyncClient() as client:
                 response = await client.send(request)
                 if response.status_code == 401:
-                    response = await self.send_refresh_token(request)
+                    response = await self.send_refresh_token()
                     response_data = response.json()
                     if 'access' in response_data:
                         request.headers['Authorization'] = 'Bearer ' + response_data['access']

@@ -52,9 +52,7 @@ def get_refresh_token(user_id) -> str:
     return user.refresh_token
 
 
-def get_language(language_code):
-    language = Language.objects(language=language_code).first()
-    return language
+
 
 
 

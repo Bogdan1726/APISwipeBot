@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-09-26 16:17+0300\n"
+"POT-Creation-Date: 2022-09-29 18:01+0300\n"
 "PO-Revision-Date: 2022-09-20 16:51+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: uk\n"
@@ -19,16 +19,16 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.10.3\n"
 
-#: handlers/authentication.py:26 handlers/management.py:71
-#: handlers/registration.py:37
+#: handlers/authentication.py:19 handlers/management.py:101
+#: handlers/registration.py:21
 msgid "Введите e-mail:"
 msgstr "Введіть e-mail:"
 
-#: handlers/authentication.py:36
+#: handlers/authentication.py:29
 msgid "Введите пароль:"
 msgstr "Введіть пароль:"
 
-#: handlers/authentication.py:47
+#: handlers/authentication.py:40
 msgid ""
 "Ваши данные для входа \n"
 "E-mail: {email}\n"
@@ -42,7 +42,7 @@ msgstr ""
 "Якщо все правильно натисніть кнопку «Авторизуватися»\n"
 "В іншому випадку натисніть «Скасувати» і повторіть спробу"
 
-#: handlers/authentication.py:67
+#: handlers/authentication.py:60
 msgid ""
 "Авторизация прошла успешно\n"
 "Добро пожаловать в Главное меню"
@@ -50,7 +50,7 @@ msgstr ""
 "Авторизація пройшла успішно\n"
 "Ласкаво просимо до Головного меню"
 
-#: handlers/authentication.py:74
+#: handlers/authentication.py:67
 msgid ""
 "Ошибка авторизации, попробуйте еще\n"
 "Не забудьте убедится в правильности введенных данных"
@@ -58,11 +58,28 @@ msgstr ""
 "Помилка авторизації, спробуйте ще\n"
 "Не забудьте переконатися у правильності введених даних"
 
-#: handlers/base.py:27 handlers/base.py:37 handlers/management.py:43
+#: handlers/base.py:15
+msgid "к выбору языка"
+msgstr "до вибору мови"
+
+#: handlers/base.py:23
+msgid "отмена"
+msgstr "Cкасувати"
+
+
+#: handlers/base.py:39
+msgid "Привет"
+msgstr "вітання"
+
+#: handlers/base.py:27 handlers/base.py:37 handlers/management.py:74
 msgid "Пожалуйста войдите или зарегистрируйтесь чтобы продолжить"
 msgstr "Будь ласка, увійдіть або зареєструйтесь, щоб продовжити"
 
-#: handlers/management.py:28
+#: handlers/base.py:32
+msgid "выход"
+msgstr "Вихід"
+
+#: handlers/management.py:59
 msgid ""
 "Имя: {first_name}\n"
 "Фамилия: {last_name}\n"
@@ -74,28 +91,35 @@ msgstr ""
 "Телефон: {phone}\n"
 "E-mail: {email}"
 
-#: handlers/management.py:57
+#: handlers/management.py:87
 msgid "Для изменения данных нажмите кнопку c нужным для вас полем"
 msgstr "Щоб змінити дані, натисніть кнопку c потрібним для вас полем"
 
-#: handlers/management.py:77
+#: handlers/management.py:107
 msgid "Введите телефон:"
 msgstr "Введіть телефон:"
 
-#: handlers/management.py:83 handlers/registration.py:161
-#: handlers/registration.py:178
+#: handlers/management.py:113 handlers/registration.py:145
+#: handlers/registration.py:162
 msgid "Введите имя:"
 msgstr "Введіть ім'я:"
 
-#: handlers/management.py:89 handlers/registration.py:224
+#: handlers/management.py:119 handlers/registration.py:208
 msgid "Введите фамилию:"
 msgstr "Введіть прізвище:"
 
-#: handlers/management.py:95
+#: handlers/management.py:125
+msgid ""
+"Прикрепите новое фото в сообщении\n"
+"Рекомендуемый размер: (300x300)\n"
+"И не более 20 мегабайт"
+msgstr ""
+
+#: handlers/management.py:133
 msgid "Я не знаю такой команды, попробуйте еще раз!"
 msgstr "Я не знаю такої команди, спробуйте ще раз!"
 
-#: handlers/management.py:105
+#: handlers/management.py:143
 msgid ""
 "Электронная почта - имеет неверный формат, пожалуйста, введите адрес "
 "электронной почты еще раз"
@@ -103,68 +127,136 @@ msgstr ""
 "Електронна пошта - має неправильний формат, будь ласка, введіть свою "
 "адресу електронної пошти ще раз"
 
-#: handlers/management.py:119
+#: handlers/management.py:153
+msgid "Электронная почта успешно изменена"
+msgstr ""
+
+#: handlers/management.py:159
+msgid "Возникла ошибка при попытке изменить электронную почту"
+msgstr ""
+
+#: handlers/management.py:170
 msgid "Номер телефона - имеет неверный формат, введите телефон еще раз"
 msgstr "Номер телефону – має невірний формат, введіть телефон ще раз"
 
-#: handlers/management.py:133
+#: handlers/management.py:180
+msgid "Номер телефона успешно изменен"
+msgstr ""
+
+#: handlers/management.py:186
+msgid "Возникла ошибка при попытке изменить номер телефона"
+msgstr ""
+
+#: handlers/management.py:197
 msgid "Имя  - имеет неверный формат, введите имя еще раз"
 msgstr "Ім'я має невірний формат, введіть ім'я ще раз"
 
-#: handlers/management.py:149
+#: handlers/management.py:207
+msgid "Имя успешно изменено"
+msgstr ""
+
+#: handlers/management.py:213
+msgid "Возникла ошибка при попытке изменить имя"
+msgstr ""
+
+#: handlers/management.py:224
 msgid "Фамилия  - имеет неверный формат, введите фимилию еще раз"
 msgstr "Прізвище має невірний формат, введіть прізвище ще раз"
 
-#: handlers/registration.py:32 handlers/registration.py:72
-#: handlers/registration.py:73 handlers/registration.py:76
-#: handlers/registration.py:156 handlers/registration.py:159
-msgid "Назад"
-msgstr "Назад"
+#: handlers/management.py:234
+msgid "Фамилия успешно изменена"
+msgstr ""
 
-#: handlers/registration.py:33
-msgid "Регистрация"
-msgstr "Реєстрація"
+#: handlers/management.py:240
+msgid "Возникла ошибка при попытке изменить фамилию"
+msgstr ""
 
-#: handlers/registration.py:43
-msgid "Редактировать email"
-msgstr "Редагувати email"
+#: handlers/management.py:252
+msgid "Фото превышает рекомендуемый размер"
+msgstr ""
 
-#: handlers/registration.py:46
+#: handlers/management.py:264
+msgid "Фото профиля успешно изменено"
+msgstr ""
+
+#: handlers/management.py:270
+msgid "Возникла ошибка при попытке изменить фото профиля"
+msgstr ""
+
+#: handlers/management.py:276
+msgid "Недопустимый формат фотографии"
+msgstr ""
+
+#: handlers/management.py:298
+msgid ""
+"{purpose}\n"
+"Адрес - {address}\n"
+"Площадь - {area} кв.м\n"
+"Планировка - {layout}\n"
+"Количество комнат - {rooms}\n"
+"Жилое состояние - {condition}\n"
+"Цена - {price} грн\n"
+"{description}\n"
+msgstr ""
+
+#: handlers/management.py:318
+msgid ""
+"Чтобы отредактировать объявление, нажмите кнопку рядом с нужным вам "
+"объявлением"
+msgstr ""
+
+#: handlers/management.py:324
+msgid "У вас нет ни одного объявления!"
+msgstr ""
+
+#: handlers/management.py:336
+msgid "Test"
+msgstr ""
+
+#: handlers/management.py:351
+msgid "Выберите назначение объявления из доступных ниже вариантов\n"
+msgstr ""
+
+#: handlers/management.py:362
+msgid ""
+"Выбраного значения нет среди допустимых вариантов, попробуйте еще из "
+"доступных ниже вариантов\n"
+msgstr ""
+
+#: handlers/management.py:369
+msgid "Выберите ЖК из доступных ниже вариантов"
+msgstr ""
+
+#: handlers/registration.py:30
 msgid "Введите новый e-mail, или вернитесь обратно к данным"
 msgstr "Введіть новий e-mail або поверніться назад до даних"
 
-#: handlers/registration.py:54 handlers/registration.py:110
-#: handlers/registration.py:195 handlers/registration.py:241
-#: handlers/registration.py:259
+#: handlers/registration.py:38
 #, fuzzy
-msgid "Вернутся к регистрации"
+msgid "вернутся к регистрации"
 msgstr "Повернутися до реєстрації"
 
-#: handlers/registration.py:60
+#: handlers/registration.py:44
 msgid ""
 "Электронная почта - имеет неверный формат, ппопробуйте еще раз, или "
 "вернитесь обратно к данным"
 msgstr ""
 
-#: handlers/registration.py:78 handlers/registration.py:93
+#: handlers/registration.py:62 handlers/registration.py:77
 msgid "Укажите пароль:"
 msgstr "Вкажіть пароль:"
 
-#: handlers/registration.py:86
+#: handlers/registration.py:70
 msgid "Электронная почта - имеет неверный формат, ппопробуйте еще раз"
 msgstr ""
 "Електронна пошта - має неправильний формат, будь ласка, введіть свою "
 "адресу електронної пошти ще раз"
 
-#: handlers/registration.py:99
-msgid "Редактировать пароль"
-msgstr "Редагувати пароль"
-
-#: handlers/registration.py:102
+#: handlers/registration.py:86
 msgid "Введите новый пароль, или вернитесь обратно к данным"
 msgstr "Введіть новий пароль або поверніться назад до даних"
 
-#: handlers/registration.py:116 handlers/registration.py:136
+#: handlers/registration.py:100 handlers/registration.py:120
 msgid ""
 "Пароль слишком простой, попробуйте еще раз \n"
 "Пароль должен: \n"
@@ -178,41 +270,33 @@ msgstr ""
 "- Містити символ верхнього та нижнього регістру \n"
 "- Мати мінімум 8 символів"
 
-#: handlers/registration.py:147
+#: handlers/registration.py:131
 msgid "Повторите пароль:"
 msgstr "Повторіть пароль:"
 
-#: handlers/registration.py:171
+#: handlers/registration.py:155
 msgid "Пароли не совпадают, попробуйте еще раз"
 msgstr "Паролі не збігаються, спробуйте ще раз"
 
-#: handlers/registration.py:184
-msgid "редактировать имя"
-msgstr "Редагувати ім'я"
-
-#: handlers/registration.py:187
+#: handlers/registration.py:171
 msgid "Введите имя заново, или вернитесь обратно к данным"
 msgstr "Введіть ім'я знову, або поверніться назад до даних"
 
-#: handlers/registration.py:201
+#: handlers/registration.py:185
 msgid ""
 "Введенное имя некорректно, попробуйте еще раз, или вернитесь обратно к "
 "данным"
 msgstr "Введене ім'я некоректне, спробуйте ще раз, або поверніться назад до даним"
 
-#: handlers/registration.py:217
+#: handlers/registration.py:201
 msgid "Введенное имя некорректно, попробуйте еще раз"
 msgstr "Введене ім'я некоректне, спробуйте ще раз"
 
-#: handlers/registration.py:230
-msgid "Редактировать фамилию"
-msgstr "редагувати прізвище"
-
-#: handlers/registration.py:233
+#: handlers/registration.py:217
 msgid "Введите фамилию заново, или вернитесь обратно к данным"
 msgstr "Введіть прізвище заново або поверніться назад до даних"
 
-#: handlers/registration.py:247
+#: handlers/registration.py:231
 msgid ""
 "Введенная фамилия некорректна, попробуйте еще раз, или вернитесь обратно "
 "к данным"
@@ -220,11 +304,11 @@ msgstr ""
 "Введене прізвище некоректне, спробуйте ще раз, або поверніться назаддо "
 "даних"
 
-#: handlers/registration.py:268
+#: handlers/registration.py:252
 msgid "Введенная фамилия некорректна, попробуйте еще раз"
 msgstr "Введене прізвище некоректне, спробуйте ще раз"
 
-#: handlers/registration.py:275
+#: handlers/registration.py:259
 msgid ""
 "Ваши данные для регистрации \n"
 "E-mail: {email}\n"
@@ -244,7 +328,7 @@ msgstr ""
 "Якщо ви хочете виправити дані, натисніть кнопку з потрібним вам полем\n"
 "Скасувати реєстрацію, натисніть «Скасувати»"
 
-#: handlers/registration.py:301
+#: handlers/registration.py:285
 msgid ""
 "Регистрация прошла успешно, письмо с подтверждением отправлено\n"
 "на почту {email}\n"
@@ -254,7 +338,7 @@ msgstr ""
 "на пошту {email}\n"
 "Перейдіть за посиланням у листі для завершення реєстрації"
 
-#: handlers/registration.py:311
+#: handlers/registration.py:295
 msgid ""
 "Ошибка регистрации, попробуйте еще\n"
 "Не забудьте убедится в правильности введенных данных"
@@ -283,57 +367,90 @@ msgstr "Реєстрація"
 msgid "К выбору языка"
 msgstr "До вибору мови"
 
-#: keyboards/base_keyboard.py:39
+#: keyboards/base_keyboard.py:39 keyboards/management_keyboards.py:185
 msgid "Назад"
 msgstr "Назад"
 
-#: keyboards/management_keyboards.py:9
+#: keyboards/management_keyboards.py:11
 msgid "Объявления"
 msgstr "Оголошення"
 
-#: keyboards/management_keyboards.py:10
+#: keyboards/management_keyboards.py:12
 msgid "Профиль"
 msgstr "Профіль"
 
-#: keyboards/management_keyboards.py:12
+#: keyboards/management_keyboards.py:14
 msgid "Выход"
 msgstr "Вихід"
 
-#: keyboards/management_keyboards.py:24
+#: keyboards/management_keyboards.py:26
 msgid "Мои обьявления"
 msgstr "Мої оголошення"
 
-#: keyboards/management_keyboards.py:25
+#: keyboards/management_keyboards.py:27
 msgid "Редактировать профиль"
 msgstr "Редагувати профіль"
 
-#: keyboards/management_keyboards.py:27
+#: keyboards/management_keyboards.py:29
 msgid "Назад в Главное меню"
 msgstr "Назад до Головного меню"
 
-#: keyboards/management_keyboards.py:39 keyboards/registration_keyboard.py:11
+#: keyboards/management_keyboards.py:41 keyboards/registration_keyboard.py:11
 msgid "Редактировать email"
 msgstr "Редагувати email"
 
-#: keyboards/management_keyboards.py:40
+#: keyboards/management_keyboards.py:42
 msgid "Редактировать телефон"
 msgstr "Редагувати телефон"
 
-#: keyboards/management_keyboards.py:43 keyboards/registration_keyboard.py:15
+#: keyboards/management_keyboards.py:45 keyboards/registration_keyboard.py:15
 msgid "Редактировать имя"
 msgstr "Редагувати ім'я"
 
-#: keyboards/management_keyboards.py:44 keyboards/registration_keyboard.py:16
+#: keyboards/management_keyboards.py:46 keyboards/registration_keyboard.py:16
 msgid "Редактировать фамилию"
-msgstr "Редагувати прізвище"
+msgstr "редагувати прізвище"
 
-#: keyboards/management_keyboards.py:47
+#: keyboards/management_keyboards.py:49
+msgid "Установить новое фото профиля"
+msgstr ""
+
+#: keyboards/management_keyboards.py:52 keyboards/management_keyboards.py:79
+#: keyboards/management_keyboards.py:92
 msgid "Назад в Профиль"
 msgstr "Назад до Профілю"
 
-#: keyboards/management_keyboards.py:60
+#: keyboards/management_keyboards.py:65
 msgid "Отменить редактирование"
 msgstr "Скасувати редагування"
+
+#: keyboards/management_keyboards.py:93
+msgid "Добавить объявление"
+msgstr "Мої оголошення"
+
+#: keyboards/management_keyboards.py:141
+msgid "Редактировать объявления"
+msgstr "Редагувати ім'я"
+
+#: keyboards/management_keyboards.py:155
+msgid "Дом"
+msgstr ""
+
+#: keyboards/management_keyboards.py:156
+msgid "Квартира"
+msgstr ""
+
+#: keyboards/management_keyboards.py:159
+msgid "Коммерческие помещения"
+msgstr ""
+
+#: keyboards/management_keyboards.py:160
+msgid "Офисное помещение"
+msgstr ""
+
+#: keyboards/management_keyboards.py:162 keyboards/management_keyboards.py:184
+msgid "Вернутся к объявлениям"
+msgstr ""
 
 #: keyboards/registration_keyboard.py:8
 msgid "Зарегистрироватся"
@@ -347,56 +464,4 @@ msgstr "Редагувати пароль"
 msgid "Вернутся к регистрации"
 msgstr "Повернутися до реєстрації"
 
-#~ msgid "Нет такой команды"
-#~ msgstr "Немає такої команди"
-
-#~ msgid "Пожалуйста войдите или зарегистрируйтесь чтобы продолжить."
-#~ msgstr "Будь ласка, увійдіть або зареєструйтесь, щоб продовжити."
-
-#~ msgid "Регистрация"
-#~ msgstr "Реєстрація"
-
-#~ msgid "My menu entry"
-#~ msgstr ""
-
-#~ msgid "Авторизоватся"
-#~ msgstr "Авторизуватися"
-
-#~ msgid "К выбору языка"
-#~ msgstr "До вибору мови"
-
-#~ msgid "Взод"
-#~ msgstr "Вход"
-
-#~ msgid "Register"
-#~ msgstr "Регистрация"
-
-#~ msgid "Вход"
-#~ msgstr "Вхід"
-
-#~ msgid "Отмена"
-#~ msgstr "Cкасування"
-
-#~ msgid "вход"
-#~ msgstr "вхід"
-
-#~ msgid "Мои обьявления"
-#~ msgstr "Мої оголошення"
-
-#~ msgid "Редактировать профиль"
-#~ msgstr "Редагувати профіль"
-
-#~ msgid "к выбору языка"
-#~ msgstr "до вибору мови"
-
-#~ msgid ""
-#~ "Ваши данные для регистрации \n"
-#~ "E-mail: {email}\n"
-#~ "Пароль: {password}\n"
-#~ "Имя: {first_name}\n"
-#~ "Фамилия: {last_name}\n"
-#~ "Если все верно нажмите «Зарегистрироватся»\n"
-#~ "Если вы хотите исправить данные, нажмите «Изменить данные»\n"
-#~ "Отменить регистрацию, нажмите «Отмена»"
-#~ msgstr ""
 

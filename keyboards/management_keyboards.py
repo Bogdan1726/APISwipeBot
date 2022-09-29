@@ -1,4 +1,5 @@
 from aiogram import types
+from aiogram.filters.callback_data import CallbackData
 from aiogram.utils.i18n import gettext as _
 from aiogram.utils.i18n import lazy_gettext as __
 from aiogram.utils.keyboard import InlineKeyboardBuilder
@@ -85,25 +86,11 @@ def get_profile_cancel():
     return keyboard
 
 
-def get_profile_edit_ads():
+def get_my_ads_keyboards():
     buttons = [
         [
-            types.KeyboardButton(text=str("адрес")),
-            types.KeyboardButton(text=str("описание")),
-            types.KeyboardButton(text=str("стоимость"))
-        ],
-        [
-            types.KeyboardButton(text=str("общая площадь")),
-            types.KeyboardButton(text=str("площадь кухни")),
-            types.KeyboardButton(text=str("планировка"))
-        ],
-        [
-            types.KeyboardButton(text=str('вид права')),
-            types.KeyboardButton(text=str('количество комнат')),
-            types.KeyboardButton(text=str('жилое состояние'))
-        ],
-        [
-            types.KeyboardButton(text=str('назад в Мои обьявления'))
+            types.KeyboardButton(text=str(_('Назад в Профиль'))),
+            types.KeyboardButton(text=str(_('Добавить объявление')))
         ]
     ]
     keyboard = types.ReplyKeyboardMarkup(
@@ -113,10 +100,94 @@ def get_profile_edit_ads():
     return keyboard
 
 
+def get_profile_edit_ads():
+    buttons = [
+        [
+            types.KeyboardButton(text=str("Адрес")),
+            types.KeyboardButton(text=str("Описание")),
+            types.KeyboardButton(text=str("Стоимость"))
+        ],
+        [
+            types.KeyboardButton(text=str("Общая площадь")),
+            types.KeyboardButton(text=str("Площадь кухни")),
+            types.KeyboardButton(text=str("Планировка"))
+        ],
+        [
+            types.KeyboardButton(text=str('Вид права')),
+            types.KeyboardButton(text=str('Количество комнат')),
+            types.KeyboardButton(text=str('Жилое состояние'))
+        ],
+        [
+            types.KeyboardButton(text=str('Назад в Мои обьявления'))
+        ]
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=buttons,
+        resize_keyboard=True
+    )
+    return keyboard
+
+
+# region edit ads
+class MyCallback(CallbackData, prefix="ads"):
+    pk: int
+    key: str
+
+
 def get_edit_ads_keyboard(pk):
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
         text=_("Редактировать объявления"),
-        callback_data=f"edit_ads_{pk}")
-    )
+        callback_data=MyCallback(pk=pk, key='edit_ads').pack()
+    ))
     return builder.as_markup()
+
+
+# endregion edit ads
+
+
+# region add ads
+
+def add_ads_purpose_keyboard():
+    buttons = [
+        [
+            types.KeyboardButton(text=str(_("Дом"))),
+            types.KeyboardButton(text=str(_("Квартира"))),
+        ],
+        [
+            types.KeyboardButton(text=str(_("Коммерческие помещения"))),
+            types.KeyboardButton(text=str(_("Офисное помещение"))),
+        ],
+        [types.KeyboardButton(text=str(_('Вернутся к объявлениям')))]
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=buttons,
+        resize_keyboard=True
+    )
+    return keyboard
+
+
+def add_ads_house_keyboard():
+    buttons = [
+        [
+            types.KeyboardButton(text="ЖК 1"),
+            types.KeyboardButton(text="ЖК 2"),
+            types.KeyboardButton(text="ЖК 3")
+        ],
+        [
+            types.KeyboardButton(text="ЖК 4"),
+            types.KeyboardButton(text="ЖК 5")
+        ],
+
+        [
+            types.KeyboardButton(text=str(_('Вернутся к объявлениям'))),
+            types.KeyboardButton(text=str(_("Назад")))
+        ]
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=buttons,
+        resize_keyboard=True
+    )
+    return keyboard
+
+# endregion add ads

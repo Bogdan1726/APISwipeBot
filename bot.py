@@ -12,6 +12,7 @@ i18n = I18n(path=LOCALES_DIR, default_locale="ru", domain=I18N_DOMAIN)
 bot = Bot(token=config.TOKEN)
 dp = Dispatcher()
 dp.message.outer_middleware(Localization(i18n))
+dp.callback_query.outer_middleware(Localization(i18n))
 
 
 def main() -> None:

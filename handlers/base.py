@@ -12,7 +12,7 @@ router = Router()
 
 
 @router.message(Command(commands=["start"]))
-@router.message(F.text.lower() == __("к выбору языка"))
+@router.message(F.text.casefold() == __("к выбору языка"))
 async def command_start(message: Message, state: FSMContext):
     await message.answer(
         f'Здравствуйте {message.from_user.first_name} пожалуйста выберите язык чтобы продолжить',
@@ -20,7 +20,7 @@ async def command_start(message: Message, state: FSMContext):
     await state.set_state(BaseStates.language)
 
 
-@router.message(F.text.lower() == __("отмена"))
+@router.message(F.text.casefold() == __("отмена"))
 @router.message(BaseStates.language)
 async def command_start(message: Message, state: FSMContext):
     await message.answer(
@@ -29,7 +29,7 @@ async def command_start(message: Message, state: FSMContext):
     await state.set_state(BaseStates.start)
 
 
-@router.message(F.text.lower() == __("выход"))
+@router.message(F.text.casefold() == __("выход"))
 async def command_start(message: Message, state: FSMContext):
     if is_authenticated(message.from_user.id):
         logout(message.from_user.id)

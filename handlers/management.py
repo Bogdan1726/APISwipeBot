@@ -2,6 +2,7 @@ import os
 from aiogram import Router, F, Bot
 from aiogram.filters import Text
 from aiogram.types import Message, URLInputFile, CallbackQuery
+from babel.core import Locale
 from yarl import URL
 from api_requests.user import UserApiClient
 from database.requests import is_authenticated
@@ -10,9 +11,12 @@ from aiogram.fsm.context import FSMContext
 from aiogram.utils.i18n import gettext as _
 from aiogram import html
 from aiogram.utils.i18n import lazy_gettext as __
+
+from keyboards.management_keyboards import MyCallback
 from settings.config import HOST, DEFAULT_IMAGE
 from settings.states import ProfileStates, BaseStates
-from settings.validators import validate_email, validate_name, validate_phone, validate_image
+from settings.validators import validate_email, validate_name, validate_phone, validate_image, validate_purpose, \
+    validate_address
 
 router = Router()
 
@@ -277,8 +281,8 @@ async def edit_photo(message: Message, state: FSMContext, bot: Bot):
 # endregion profile
 
 
-# region ads
-
+# region my ads
+@router.message(F.text.lower() == __('вернутся к объявлениям'))
 @router.message(F.text.lower() == __("мои обьявления"))
 @router.message(F.text.lower() == __('назад в мои обьявления'))
 async def user_ads(message: Message, state: FSMContext):
@@ -287,6 +291,11 @@ async def user_ads(message: Message, state: FSMContext):
     if is_authenticated(user):
         data = await user_client.user_ads()
         if data:
+            await message.answer(
+                text=_('Чтобы отредактировать объявление, нажмите кнопку рядом с нужным вам объявлением'),
+                reply_markup=management_keyboards.get_my_ads_keyboards()
+            )
+            await state.set_state(ProfileStates.ads)
             for ads in data:
                 await message.answer_photo(
                     photo=get_image(path=ads.get('preview_image')),
@@ -310,11 +319,6 @@ async def user_ads(message: Message, state: FSMContext):
                     ), parse_mode="HTML",
                     reply_markup=management_keyboards.get_edit_ads_keyboard(pk=ads.get('id'))
                 )
-            await message.answer(
-                text=_('Чтобы отредактировать объявление, нажмите кнопку рядом с нужным вам объявлением'),
-                reply_markup=management_keyboards.get_profile_cancel()
-            )
-            await state.set_state(ProfileStates.ads)
         else:
             await message.answer(
                 _('У вас нет ни одного объявления!'),
@@ -325,13 +329,84 @@ async def user_ads(message: Message, state: FSMContext):
         await state.set_state(BaseStates.language)
 
 
-@router.callback_query(text_startswith="edit_ads_")
-async def edit_ads(callback: CallbackQuery, bot: Bot):
-    pk = callback.data.split('_')[2]
+@router.callback_query(MyCallback.filter(F.key == "edit_ads"))
+async def edit_ads(callback: CallbackQuery, callback_data: MyCallback):
     await callback.message.answer(
-        f'{bot.context}'
+        _('Для изменения данных нажмите кнопку c нужным для вас полем'),
+        reply_markup=management_keyboards.get_profile_edit_ads()
     )
 
 
+@router.message(F.text.lower() == 'адрес')
+async def edit_ads_address(message: Message):
+    await message.answer(
+        f'{message.from_user}'
+    )
 
-# endregion ads
+
+# endregion my ads
+
+
+# region add ads
+@router.message(ProfileStates.add_ads_purpose, F.text.lower() == __('назад'))
+@router.message(ProfileStates.add_ads_house, F.text.lower() == __('назад'))
+@router.message(ProfileStates.ads, F.text.lower() == __("добавить объявление"))
+@router.message(ProfileStates.ads)
+async def add_ads_start(message: Message, state: FSMContext):
+    await message.answer(
+        _('Выберите назначение объявления из доступных ниже вариантов\n'),
+        reply_markup=management_keyboards.add_ads_purpose_keyboard()
+    )
+    await state.set_state(ProfileStates.add_ads)
+
+
+@router.message(ProfileStates.add_ads_address, F.text.lower() == __('назад'))
+@router.message(ProfileStates.add_ads)
+async def add_ads_purpose(message: Message, state: FSMContext):
+    if message.text.lower() == __('назад'):
+        await message.answer(
+            _('Укажите адрес'),
+            reply_markup=base_keyboard.get_cancel_group_keyboard()
+        )
+        await state.set_state(ProfileStates.add_ads_purpose)
+    else:
+        purpose = message.text
+        if validate_purpose(purpose) is False:
+            await message.answer(
+                _('Выбраного значения нет среди допустимых вариантов, попробуйте еще из доступных ниже вариантов\n'),
+                reply_markup=management_keyboards.add_ads_purpose_keyboard()
+            )
+            await state.set_state(ProfileStates.add_ads)
+        else:
+            await state.update_data(purpose=purpose)
+            if purpose == 'Квартира':
+                await message.answer(
+                    _('Выберите ЖК из доступных ниже вариантов'),
+                    reply_markup=management_keyboards.add_ads_house_keyboard()
+                )
+                await state.set_state(ProfileStates.add_ads_house)
+            else:
+                await message.answer(
+                    _('Укажите адрес'),
+                    reply_markup=base_keyboard.get_cancel_group_keyboard()
+                )
+                await state.set_state(ProfileStates.add_ads_purpose)
+
+
+@router.message(ProfileStates.add_ads_purpose)
+async def add_ads_address(message: Message, state: FSMContext):
+    address = message.text
+    if validate_address(address) is False:
+        await message.answer(
+            _('Адрес - имеет неверный формат, ппопробуйте еще раз'),
+            reply_markup=base_keyboard.get_cancel_group_keyboard()
+        )
+        await state.set_state(ProfileStates.add_ads_purpose)
+    else:
+        await message.answer(
+            _('Укажите площадь'),
+            reply_markup=base_keyboard.get_cancel_group_keyboard()
+        )
+        await state.set_state(ProfileStates.add_ads_address)
+
+# endregion add ads

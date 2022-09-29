@@ -34,3 +34,19 @@ def validate_image(value) -> bool:
     if value.height > 300 or value.width > 300 or value.file_size > 19900000:
         return False
     return True
+
+
+def validate_purpose(purpose: str) -> bool:
+    if purpose in ['Дом', 'Квартира', 'Коммерческие помещения', 'Офисное помещение']:
+        return True
+    else:
+        return False
+
+
+def validate_address(address: str):
+    if len(address) > 10 and address.isspace() is False:
+        return True
+    else:
+        return False
+
+

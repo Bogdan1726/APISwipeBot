@@ -9,14 +9,19 @@ class BaseStates(StatesGroup):
 class ProfileStates(StatesGroup):
     profile = State()
     edit_profile = State()
-    ads = State()
-    edit_ads = State()
     edit_fields = State()
     email = State()
     phone = State()
     first_name = State()
     last_name = State()
     photo = State()
+    ads = State()
+    edit_ads = State()
+    add_ads = State()
+    add_ads_purpose = State()
+    add_ads_address = State()
+    add_ads_house = State()
+    test = State()
 
 
 class RegistrationStates(StatesGroup):

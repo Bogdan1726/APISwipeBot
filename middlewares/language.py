@@ -1,5 +1,8 @@
+from datetime import datetime
+
+from aiogram import BaseMiddleware
 from aiogram.utils.i18n.middleware import I18nMiddleware
-from aiogram.types import TelegramObject, User
+from aiogram.types import TelegramObject, User, CallbackQuery
 from typing import Optional, cast
 from typing import Dict, Any
 from settings.config import redis
@@ -27,16 +30,17 @@ class Localization(I18nMiddleware):
         if language:
             return language.decode()
 
+    @staticmethod
+    async def get_handler_language(data):
+        """
+        Get value clicked keyboard
+        """
+        language = 'ru' if data.get('text') == 'Русский' else 'uk' if data.get('text') == 'Украинский' else None
+        return language
+
     async def get_locale(self, event: TelegramObject, data: Dict[str, Any]) -> str:
         message_dict = event.dict()
-        language = 'ru' if message_dict.get('text') == 'Русский' else 'uk' if message_dict.get(
-            'text') == 'Украинский' else None
-        if Locale is None:  # pragma: no cover
-            raise RuntimeError(
-                f"{type(self).__name__} can be used only when Babel installed\n"
-                "Just install Babel (`pip install Babel`) "
-                "or aiogram with i18n support (`pip install aiogram[i18n]`)"
-            )
+        language = await self.get_handler_language(message_dict)
 
         event_from_user: Optional[User] = data.get("event_from_user", None)
         if event_from_user is None or event_from_user.language_code is None:

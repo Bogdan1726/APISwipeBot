@@ -6,10 +6,10 @@ from aiogram.utils.i18n import lazy_gettext as __
 def get_base_keyboard():
     buttons = [
         [
-            types.KeyboardButton(text=str(_("Вход"))),
-            types.KeyboardButton(text=str(_("Регистрация")))
+            types.KeyboardButton(text=_("Вход")),
+            types.KeyboardButton(text=_("Регистрация"))
         ],
-        [types.KeyboardButton(text=str(_("К выбору языка")))]
+        [types.KeyboardButton(text=_("К выбору языка"))]
     ]
     keyboard = types.ReplyKeyboardMarkup(
         keyboard=buttons,
@@ -35,8 +35,8 @@ def get_language_keyboard():
 def get_cancel_group_keyboard():
     buttons = [
         [
-            types.KeyboardButton(text=str(_("Отмена"))),
-            types.KeyboardButton(text=str(_('Назад')))
+            types.KeyboardButton(text=_("Отмена")),
+            types.KeyboardButton(text=_('Назад'))
         ]
     ]
     keyboard = types.ReplyKeyboardMarkup(
@@ -49,7 +49,7 @@ def get_cancel_group_keyboard():
 def get_cancel_keyboard():
     buttons = [
         [
-            types.KeyboardButton(text=str(_('Отмена')))
+            types.KeyboardButton(text=_('Отмена'))
         ]
     ]
 
