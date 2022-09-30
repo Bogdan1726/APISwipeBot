@@ -2,11 +2,9 @@ from abc import ABC, abstractmethod
 from httpx import Response
 from database.requests import set_tokens, get_refresh_token
 from settings.config import HOST
-from aiogram.client.session import aiohttp
 from yarl import URL
 from database.requests import get_token, update_token, logout
 import httpx
-from requests_toolbelt import MultipartEncoder
 
 
 class BaseApiClient(ABC):
@@ -144,3 +142,41 @@ class UserApiClient(BaseApiClient):
             return response.json()
         else:
             return False
+
+
+class AdsApiClient(BaseApiClient):
+
+    def handler_response_errors(self, response: Response) -> Response:
+        return response
+
+    def get_header(self) -> dict:
+        headers = {
+            'accept': 'application/json',
+            'Authorization': 'Bearer ' + get_token(self.user)
+        }
+        return headers
+
+    async def create_ads(self, validated_data):
+        data = {
+            'address': validated_data.get('address'),
+            'description': validated_data.get('description'),
+            'area': validated_data.get('area'),
+            'price': int(validated_data.get('price')),
+            'purpose': validated_data.get('purpose'),
+            'rooms': validated_data.get('rooms'),
+            'condition': validated_data.get('condition'),
+            'residential_complex': validated_data.get('residential_complex'),
+        }
+        print(data)
+        # request = self.client.build_request(method='POST',
+        #                                     url=str(self.url.with_path('/ads/announcement/')),
+        #                                     headers=self.get_header(),
+        #                                     data=data)
+        #
+        # response = await self.send_request(request)
+        # print(response)
+        # if response.status_code == 200:
+        #     return response.json()
+        # else:
+        #     return False
+

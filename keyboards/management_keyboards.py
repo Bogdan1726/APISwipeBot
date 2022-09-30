@@ -167,6 +167,27 @@ def add_ads_purpose_keyboard():
     return keyboard
 
 
+def add_ads_condition_keyboard():
+    buttons = [
+        [
+            types.KeyboardButton(text=str(_("Черновая"))),
+            types.KeyboardButton(text=str(_("Ремонт от застройщика"))),
+            types.KeyboardButton(text=str(_("В жилом состоянии"))),
+        ],
+        [
+            types.KeyboardButton(text=str(_("Назад")))
+        ],
+        [
+            types.KeyboardButton(text=str(_('Вернутся к объявлениям')))
+        ]
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=buttons,
+        resize_keyboard=True
+    )
+    return keyboard
+
+
 def add_ads_house_keyboard():
     buttons = [
         [
@@ -178,7 +199,40 @@ def add_ads_house_keyboard():
             types.KeyboardButton(text="ЖК 4"),
             types.KeyboardButton(text="ЖК 5")
         ],
+        [
+            types.KeyboardButton(text=str(_("Назад")))
+        ],
 
+        [
+            types.KeyboardButton(text=str(_('Вернутся к объявлениям')))
+        ]
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=buttons,
+        resize_keyboard=True
+    )
+    return keyboard
+
+
+def add_ads_back_keyboard():
+    buttons = [
+        [
+            types.KeyboardButton(text=str(_('Вернутся к объявлениям'))),
+            types.KeyboardButton(text=str(_("Назад")))
+        ]
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=buttons,
+        resize_keyboard=True
+    )
+    return keyboard
+
+
+def add_ads_finish():
+    buttons = [
+        [
+            types.KeyboardButton(text=str(_('Добавить')))
+        ],
         [
             types.KeyboardButton(text=str(_('Вернутся к объявлениям'))),
             types.KeyboardButton(text=str(_("Назад")))

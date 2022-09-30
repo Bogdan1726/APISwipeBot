@@ -1,4 +1,5 @@
 import re
+from aiogram.utils.i18n import gettext as _
 
 
 def validate_email(email: str) -> bool:
@@ -37,16 +38,99 @@ def validate_image(value) -> bool:
 
 
 def validate_purpose(purpose: str) -> bool:
-    if purpose in ['Дом', 'Квартира', 'Коммерческие помещения', 'Офисное помещение']:
+    if purpose in [_('Дом'), _('Квартира'), _('Коммерческие помещения'), _('Офисное помещение')]:
         return True
     else:
         return False
 
 
-def validate_address(address: str):
+def validate_address(address: str) -> bool:
     if len(address) > 10 and address.isspace() is False:
+        return bool(re.search('[а-яА-Я0-9]', address))
+    else:
+        return False
+
+
+def validate_house(house: str) -> bool:
+    if house in ['ЖК 1', 'ЖК 2', 'ЖК 3', 'ЖК 4', 'ЖК 5']:
         return True
     else:
         return False
+
+
+def validate_area(area: str) -> bool:
+    if area.isdigit() and len(area) <= 4:
+        return True
+    else:
+        return False
+
+
+def validate_kitchen(area: str, area_kitchen: str) -> bool:
+    if area_kitchen.isdigit() and len(area_kitchen) <= 4:
+        if area > area_kitchen:
+            return True
+        else:
+            return False
+    else:
+        return False
+
+
+def validate_room(room: str) -> bool:
+    if room.isdigit():
+        if int(room) <= 10:
+            return True
+        else:
+            return False
+    else:
+        return False
+
+
+def validate_condition(condition: str) -> bool:
+    if condition in [_("Черновая"), _("Ремонт от застройщика"), _("В жилом состоянии")]:
+        return True
+    else:
+        return False
+
+
+def validate_description(description: str) -> bool:
+    if len(description) >= 20 and description.isspace() is False:
+        return bool(re.search('[а-яА-Я]', description))
+    else:
+        return False
+
+
+def validate_price(price: str) -> bool:
+    price = price.replace(' ', '')
+    if price.isdigit():
+        if 100000000 > int(price) >= 0:
+            return True
+        else:
+            return False
+    else:
+        return False
+
+
+def parse_ads_data(data: dict) -> dict:
+    purpose_dic = {
+        "Будинок": "Дом",
+        "Квартира": "Квартира",
+        "У житловому стані": "Коммерческие помещения",
+        'Офісне приміщення': "Коммерческие помещения"
+    }
+    condition_dic = {
+        "Чорнова": "Черновая",
+        "Ремонт від забудовника": "Ремонт от застройщика",
+        "У житловому стані": "В жилом состоянии"
+    }
+    condition = data.get('condition')
+    purpose = data.get('purpose')
+    if condition_dic.get(condition):
+        _condition = condition_dic.get(condition)
+        data['condition'] = _condition
+    if purpose_dic.get(purpose):
+        _purpose = purpose_dic.get(purpose)
+        data['purpose'] = _purpose
+    return data
+
 
 

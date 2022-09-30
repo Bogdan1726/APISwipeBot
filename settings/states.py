@@ -21,6 +21,12 @@ class ProfileStates(StatesGroup):
     add_ads_purpose = State()
     add_ads_address = State()
     add_ads_house = State()
+    add_ads_area = State()
+    add_ads_area_kitchen = State()
+    add_ads_room = State()
+    add_ads_condition = State()
+    add_ads_description = State()
+    add_ads_price = State()
     test = State()
 
 
