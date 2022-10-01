@@ -1,7 +1,8 @@
 import os
 from aiogram import Router, F, Bot
 from aiogram.filters import Text
-from aiogram.types import Message, URLInputFile, CallbackQuery, ReplyKeyboardRemove
+from aiogram.types import Message, URLInputFile, CallbackQuery, ReplyKeyboardRemove, InputFile, BufferedInputFile, \
+    FSInputFile
 from babel.core import Locale
 from yarl import URL
 from api_requests.user import UserApiClient, AdsApiClient
@@ -17,7 +18,7 @@ from settings.config import HOST, DEFAULT_IMAGE
 from settings.states import ProfileStates, BaseStates
 from settings.validators import validate_email, validate_name, validate_phone, validate_image, validate_purpose, \
     validate_address, validate_house, validate_area, validate_kitchen, validate_room, validate_condition, \
-    validate_description, validate_price, parse_ads_data
+    validate_description, validate_price, parse_ads_data, validate_image_ads
 
 router = Router()
 
@@ -578,7 +579,7 @@ async def add_ads_description(message: Message, state: FSMContext):
 
 
 @router.message(ProfileStates.add_ads_description)
-async def add_ads_description(message: Message, state: FSMContext):
+async def edit_photo(message: Message, state: FSMContext, bot: Bot):
     price = message.text.replace(' ', '')
     if validate_price(price) is False:
         await message.answer(
@@ -586,41 +587,89 @@ async def add_ads_description(message: Message, state: FSMContext):
               'Диапазон доступной цены – от 0 грн. до 100 000 000 грн.'),
             reply_markup=management_keyboards.add_ads_back_keyboard()
         )
-        await state.set_state(ProfileStates.add_ads_condition)
+        await state.set_state(ProfileStates.add_ads_description)
     else:
         await state.update_data(price=price)
-        data = await state.get_data()
         await message.answer(
-            _('Ваши данные для нового объявление \n'
-              'Адрес: {address}\n'
-              'Назначение: {purpose}\n'
-              'Жилой комплекс: {house}\n'
-              'Жилое состояние: {condition}\n'
-              'Общая площадь: {area} м2\n'
-              'Площадь кухни: {area_kitchen} м2\n'
-              'Описание: {description}\n'
-              'Цена: {price} - грн\n'
-              'Если все верно нажмите «Добавить»\n'
-              'Если вы хотите исправить данные, нажимайте «Назад»\n'
-              ).format(
-                address=data.get('address'),
-                house=data.get('house') if data.get('house') else 'Вы выбрали назначение которое не требует выбора ЖК',
-                purpose=data.get('purpose'),
-                condition=data.get('condition'),
-                area=data.get('area'),
-                description=data.get('description'),
-                area_kitchen=data.get('area_kitchen'),
-                price=data.get('price')),
-            reply_markup=management_keyboards.add_ads_finish()
+            _("Прикрепите одну фотографию в сообщении\n"
+              "Рекомендуемый размер: (800x800)\n"
+              "И не более 20 мегабайт"),
+            reply_markup=management_keyboards.add_ads_back_keyboard()
         )
         await state.set_state(ProfileStates.add_ads_price)
 
 
-@router.message(F.text.lower() == __('добавить'))
+@router.message(ProfileStates.add_ads_price)
+async def add_ads_description(message: Message, state: FSMContext, bot: Bot):
+    try:
+        photo = message.photo[-1]
+        if validate_image_ads(photo) is False:
+            await message.answer(
+                _('Фото превышает рекомендуемый размер')
+            )
+            await state.set_state(ProfileStates.add_ads_price)
+        else:
+            file = await bot.get_file(photo.file_id)
+            filename, file_extension = os.path.splitext(file.file_path)
+            src = 'files/ads/' + file.file_id + file_extension
+            await bot.download_file(file_path=file.file_path, destination=src)
+            await state.update_data(ads_image_src=src)
+            data = await state.get_data()
+            image = FSInputFile(data.get('ads_image_src'))
+            await message.answer_photo(
+                photo=image,
+                caption=
+                _('Адрес: {address}\n'
+                  'Назначение: {purpose}\n'
+                  'Жилой комплекс: {house}\n'
+                  'Жилое состояние: {condition}\n'
+                  'Общая площадь: {area} м2\n'
+                  'Площадь кухни: {area_kitchen} м2\n'
+                  'Количество комнат: {room} \n'
+                  'Описание: {description}\n'
+                  'Цена: {price} - грн\n'
+                  'Если все верно нажмите «Добавить»\n'
+                  'Если вы хотите исправить данные, нажимайте «Назад»\n'
+                  ).format(
+                    address=data.get('address'),
+                    house=data.get('house') if data.get(
+                        'house') else 'Вы выбрали назначение которое не требует выбора ЖК',
+                    purpose=data.get('purpose'),
+                    condition=data.get('condition'),
+                    area=data.get('area'),
+                    description=data.get('description'),
+                    area_kitchen=data.get('area_kitchen'),
+                    price=data.get('price'),
+                    room=data.get('room')),
+                reply_markup=management_keyboards.add_ads_finish()
+            )
+            await state.set_state(ProfileStates.add_ads_data)
+    except TypeError:
+        await message.answer(
+            _('Недопустимый формат фотографии'),
+            reply_markup=management_keyboards.add_ads_back_keyboard()
+        )
+
+
+@router.message(ProfileStates.add_ads_data, F.text.lower() == __('добавить'))
 async def add_ads(message: Message, state: FSMContext):
     data = await state.get_data()
     validated_data = parse_ads_data(data)
     ads_client = AdsApiClient(message.from_user.id)
-    await ads_client.create_ads(validated_data)
+    if await ads_client.create_ads(validated_data):
+        await message.answer(
+            _('Объявления успешно добавлено'),
+            reply_markup=ReplyKeyboardRemove()
+        )
+        await state.clear()
+        await user_ads(message, state)
+    else:
+        await message.answer(
+            _('При попытке добавить объявление произошла ошибка, попробуйте еще'),
+            reply_markup=ReplyKeyboardRemove()
+        )
+        await state.clear()
+        await user_ads(message, state)
+
 
 # endregion add ads

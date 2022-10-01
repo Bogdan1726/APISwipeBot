@@ -37,6 +37,12 @@ def validate_image(value) -> bool:
     return True
 
 
+def validate_image_ads(value) -> bool:
+    if value.height > 800 or value.width > 800 or value.file_size > 19900000:
+        return False
+    return True
+
+
 def validate_purpose(purpose: str) -> bool:
     if purpose in [_('Дом'), _('Квартира'), _('Коммерческие помещения'), _('Офисное помещение')]:
         return True
@@ -122,15 +128,25 @@ def parse_ads_data(data: dict) -> dict:
         "Ремонт від забудовника": "Ремонт от застройщика",
         "У житловому стані": "В жилом состоянии"
     }
+    residential_complex_dic = {
+        "ЖК 1": 1,
+        "ЖК 2": 2,
+        "ЖК 3": 3,
+        "ЖК 4": 4,
+        "ЖК 5": 5,
+    }
+
     condition = data.get('condition')
     purpose = data.get('purpose')
+    residential_complex = data.get('house')
+
     if condition_dic.get(condition):
         _condition = condition_dic.get(condition)
         data['condition'] = _condition
     if purpose_dic.get(purpose):
         _purpose = purpose_dic.get(purpose)
         data['purpose'] = _purpose
+    if residential_complex_dic.get(residential_complex):
+        _residential_complex = residential_complex_dic.get(residential_complex)
+        data['house'] = _residential_complex
     return data
-
-
-

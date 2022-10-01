@@ -16,6 +16,7 @@ class ProfileStates(StatesGroup):
     last_name = State()
     photo = State()
     ads = State()
+    my_ads = State()
     edit_ads = State()
     add_ads = State()
     add_ads_purpose = State()
@@ -27,6 +28,7 @@ class ProfileStates(StatesGroup):
     add_ads_condition = State()
     add_ads_description = State()
     add_ads_price = State()
+    add_ads_data = State()
     test = State()
 
 

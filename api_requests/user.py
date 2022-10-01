@@ -157,26 +157,39 @@ class AdsApiClient(BaseApiClient):
         return headers
 
     async def create_ads(self, validated_data):
+        image_path = validated_data.get('ads_image_src') or None
         data = {
             'address': validated_data.get('address'),
             'description': validated_data.get('description'),
             'area': validated_data.get('area'),
+            'area_kitchen': validated_data.get('area_kitchen'),
             'price': int(validated_data.get('price')),
             'purpose': validated_data.get('purpose'),
-            'rooms': validated_data.get('rooms'),
+            'room': validated_data.get('room'),
             'condition': validated_data.get('condition'),
-            'residential_complex': validated_data.get('residential_complex'),
+            'residential_complex': validated_data.get('house')
         }
-        print(data)
-        # request = self.client.build_request(method='POST',
-        #                                     url=str(self.url.with_path('/ads/announcement/')),
-        #                                     headers=self.get_header(),
-        #                                     data=data)
-        #
-        # response = await self.send_request(request)
-        # print(response)
-        # if response.status_code == 200:
-        #     return response.json()
-        # else:
-        #     return False
+        request = self.client.build_request(method='POST',
+                                            url=str(self.url.with_path('/ads/announcement/')),
+                                            headers=self.get_header(),
+                                            data=data,
+                                            files={
+                                                'images': open(image_path, 'rb')
+                                            } if image_path is not None else {})
 
+        response = await self.send_request(request)
+        if response.status_code == 201:
+            return response.json()
+        else:
+            return False
+
+    async def get_announcement_feed(self):
+        request = self.client.build_request(method='GET',
+                                            url=str(self.url.with_path('/ads/announcement-feed/')),
+                                            headers=self.get_header())
+
+        response = await self.send_request(request)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return False

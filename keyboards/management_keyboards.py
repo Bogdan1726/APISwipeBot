@@ -244,4 +244,48 @@ def add_ads_finish():
     )
     return keyboard
 
+
 # endregion add ads
+
+
+# region announcement
+
+class AnnouncementCallback(CallbackData, prefix="announcement"):
+    key: str
+    pk: int
+
+
+def get_announcement_keyboard(pk):
+    print(type(pk))
+    buttons = [
+        [
+            types.InlineKeyboardButton(
+                text=_("Предыдущее"),
+                callback_data=AnnouncementCallback(key='previous', pk=pk).pack()
+            ),
+            types.InlineKeyboardButton(
+                text=_("Cледующее"),
+                callback_data=AnnouncementCallback(key='next', pk=pk).pack()
+            )
+        ],
+        [
+            types.InlineKeyboardButton(
+                text=_("Показать геолокацию"),
+                callback_data=AnnouncementCallback(key='geolocation', pk=pk).pack()
+            )
+        ]
+    ]
+    keyboard = types.InlineKeyboardMarkup(inline_keyboard=buttons)
+    return keyboard
+
+
+def get_announcement_back_keyboard():
+    buttons = [
+        [types.KeyboardButton(text=str(_('Назад в Главное меню')))]
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=buttons,
+        resize_keyboard=True
+    )
+    return keyboard
+# endregion announcement
