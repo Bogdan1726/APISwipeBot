@@ -2,8 +2,36 @@ from aiogram.fsm.state import StatesGroup, State
 
 
 class BaseStates(StatesGroup):
-    start = State()
-    language = State()
+    set_language = State()
+    auth = State()
+
+
+class AuthenticationStates(StatesGroup):
+    login = State()
+    email = State()
+    password = State()
+    auth = State()
+    main_menu = State()
+
+
+class AnnouncementStates(StatesGroup):
+    ads = State()
+
+
+class AdsEditStates(StatesGroup):
+    edit = State()
+    edit_ads_fields = State()
+    address = State()
+    description = State()
+    price = State()
+    area = State()
+    area_kitchen = State()
+    layout = State()
+    founding_document = State()
+    rooms = State()
+    condition = State()
+
+
 
 
 class ProfileStates(StatesGroup):
@@ -47,8 +75,4 @@ class RegistrationStates(StatesGroup):
     edit_last_name = State()
 
 
-class AuthenticationStates(StatesGroup):
-    login = State()
-    email = State()
-    password = State()
-    auth = State()
+

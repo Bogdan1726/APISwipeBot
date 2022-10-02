@@ -7,14 +7,14 @@ from aiogram.utils.i18n import gettext as _
 from aiogram.utils.i18n import lazy_gettext as __
 from settings.validators import validate_email, validate_name, validate_password
 from aiogram import html
-from settings.states import RegistrationStates
+from settings.states import RegistrationStates, BaseStates
 
 router = Router()
 
 
 # region e-mail
 @router.message(RegistrationStates.write_password1, F.text.lower() == __('назад'))
-@router.message(F.text.lower() == __("регистрация"))
+@router.message(BaseStates.auth, F.text.lower() == __("регистрация"))
 @router.message(RegistrationStates.start_registration)
 async def register_email(message: Message, state: FSMContext) -> None:
     await message.answer(

@@ -143,6 +143,56 @@ def get_edit_ads_keyboard(pk):
     return builder.as_markup()
 
 
+def edit_ads_layout_keyboard():
+    buttons = [
+        [
+            types.KeyboardButton(text=str(_("Студия, санузел"))),
+            types.KeyboardButton(text=str(_("Классическая"))),
+        ],
+        [
+            types.KeyboardButton(text=str(_("Европланировка"))),
+            types.KeyboardButton(text=str(_("Свободная"))),
+        ],
+        [types.KeyboardButton(text=str(_('Отменить редактирование')))]
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=buttons,
+        resize_keyboard=True
+    )
+    return keyboard
+
+
+def edit_ads_founding_document_keyboard():
+    buttons = [
+        [
+            types.KeyboardButton(text=str(_("Собственность"))),
+            types.KeyboardButton(text=str(_("Свидетильство о праве на наследство"))),
+        ],
+        [types.KeyboardButton(text=str(_('Отменить редактирование')))]
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=buttons,
+        resize_keyboard=True
+    )
+    return keyboard
+
+
+def edit_ads_condition_keyboard():
+    buttons = [
+        [
+            types.KeyboardButton(text=str(_("Черновая"))),
+            types.KeyboardButton(text=str(_("Ремонт от застройщика"))),
+            types.KeyboardButton(text=str(_("В жилом состоянии"))),
+        ],
+        [types.KeyboardButton(text=str(_('Отменить редактирование')))]
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=buttons,
+        resize_keyboard=True
+    )
+    return keyboard
+
+
 # endregion edit ads
 
 
@@ -256,16 +306,15 @@ class AnnouncementCallback(CallbackData, prefix="announcement"):
 
 
 def get_announcement_keyboard(pk):
-    print(type(pk))
     buttons = [
         [
             types.InlineKeyboardButton(
                 text=_("Предыдущее"),
-                callback_data=AnnouncementCallback(key='previous', pk=pk).pack()
+                callback_data=AnnouncementCallback(key='go-previous', pk=pk).pack()
             ),
             types.InlineKeyboardButton(
                 text=_("Cледующее"),
-                callback_data=AnnouncementCallback(key='next', pk=pk).pack()
+                callback_data=AnnouncementCallback(key='go-next', pk=pk).pack()
             )
         ],
         [

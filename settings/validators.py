@@ -3,7 +3,7 @@ from aiogram.utils.i18n import gettext as _
 
 
 def validate_email(email: str) -> bool:
-    pattern = r"^[-\w\.]+@([-\w]+\.)+[-\w]{2,4}$"
+    pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
     if re.match(pattern, email) is None:
         return False
     else:

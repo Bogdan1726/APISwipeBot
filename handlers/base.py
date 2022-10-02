@@ -12,21 +12,26 @@ router = Router()
 
 
 @router.message(Command(commands=["start"]))
-@router.message(F.text.casefold() == __("к выбору языка"))
+@router.message(BaseStates.auth, F.text.casefold() == __("к выбору языка"))
 async def command_start(message: Message, state: FSMContext):
     await message.answer(
         f'Здравствуйте {message.from_user.first_name} пожалуйста выберите язык чтобы продолжить',
         reply_markup=base_keyboard.get_language_keyboard())
-    await state.set_state(BaseStates.language)
+    await state.set_state(BaseStates.set_language)
 
 
-@router.message(F.text.casefold() == __("отмена"))
-@router.message(BaseStates.language)
+@router.message(BaseStates.set_language)
 async def command_start(message: Message, state: FSMContext):
-    await message.answer(
-        _('Пожалуйста войдите или зарегистрируйтесь чтобы продолжить'),
-        reply_markup=base_keyboard.get_base_keyboard())
-    await state.set_state(BaseStates.start)
+    if message.text.casefold() in [__("русский"), __("украинский")]:
+        await message.answer(
+            _('Пожалуйста войдите или зарегистрируйтесь чтобы продолжить'),
+            reply_markup=base_keyboard.get_base_keyboard())
+        await state.set_state(BaseStates.auth)
+    else:
+        await message.answer(
+            f'Здравствуйте {message.from_user.first_name} пожалуйста выберите язык чтобы продолжить',
+            reply_markup=base_keyboard.get_language_keyboard())
+        await state.set_state(BaseStates.set_language)
 
 
 @router.message(F.text.casefold() == __("выход"))
@@ -36,4 +41,6 @@ async def command_start(message: Message, state: FSMContext):
         await message.answer(
             _('Пожалуйста войдите или зарегистрируйтесь чтобы продолжить'),
             reply_markup=base_keyboard.get_base_keyboard())
-        await state.set_state(BaseStates.start)
+        await state.set_state(BaseStates.auth)
+
+

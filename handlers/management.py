@@ -1,9 +1,6 @@
 import os
 from aiogram import Router, F, Bot
-from aiogram.filters import Text
-from aiogram.types import Message, URLInputFile, CallbackQuery, ReplyKeyboardRemove, InputFile, BufferedInputFile, \
-    FSInputFile
-from babel.core import Locale
+from aiogram.types import Message, URLInputFile, CallbackQuery, ReplyKeyboardRemove, FSInputFile
 from yarl import URL
 from api_requests.user import UserApiClient, AdsApiClient
 from database.requests import is_authenticated
@@ -12,13 +9,14 @@ from aiogram.fsm.context import FSMContext
 from aiogram.utils.i18n import gettext as _
 from aiogram import html
 from aiogram.utils.i18n import lazy_gettext as __
-
 from keyboards.management_keyboards import MyCallback
 from settings.config import HOST, DEFAULT_IMAGE
-from settings.states import ProfileStates, BaseStates
-from settings.validators import validate_email, validate_name, validate_phone, validate_image, validate_purpose, \
-    validate_address, validate_house, validate_area, validate_kitchen, validate_room, validate_condition, \
+from settings.states import ProfileStates, BaseStates, AuthenticationStates, AnnouncementStates, AdsEditStates
+from settings.validators import (
+    validate_email, validate_name, validate_phone, validate_image, validate_purpose,
+    validate_address, validate_house, validate_area, validate_kitchen, validate_room, validate_condition,
     validate_description, validate_price, parse_ads_data, validate_image_ads
+)
 
 router = Router()
 
@@ -47,8 +45,9 @@ def get_image(path=None):
 
 # region profile
 
-@router.message(F.text.lower() == __("профиль"))
-@router.message(F.text.lower() == __("назад в профиль"))
+@router.message(AuthenticationStates.main_menu, F.text.lower() == __("профиль"))
+@router.message(ProfileStates.edit_profile, F.text.lower() == __("назад в профиль"))
+@router.message(ProfileStates.ads, F.text.lower() == __("назад в профиль"))
 async def user_profile(message: Message, state: FSMContext):
     user = message.from_user.id
     user_client = UserApiClient(user)
@@ -75,13 +74,20 @@ async def user_profile(message: Message, state: FSMContext):
             await message.answer(
                 _('Пожалуйста войдите или зарегистрируйтесь чтобы продолжить'),
                 reply_markup=base_keyboard.get_base_keyboard())
-            await state.set_state(BaseStates.start)
+            await state.set_state(BaseStates.auth)
     else:
-        await state.set_state(BaseStates.language)
+        await message.answer(
+            _('Пожалуйста войдите или зарегистрируйтесь чтобы продолжить'),
+            reply_markup=base_keyboard.get_base_keyboard())
+        await state.set_state(BaseStates.auth)
 
 
-@router.message(F.text.lower() == __("редактировать профиль"))
-@router.message(F.text.lower() == __("отменить редактирование"))
+@router.message(ProfileStates.profile, F.text.lower() == __("редактировать профиль"))
+@router.message(ProfileStates.email, F.text.lower() == __("отменить редактирование"))
+@router.message(ProfileStates.first_name, F.text.lower() == __("отменить редактирование"))
+@router.message(ProfileStates.last_name, F.text.lower() == __("отменить редактирование"))
+@router.message(ProfileStates.phone, F.text.lower() == __("отменить редактирование"))
+@router.message(ProfileStates.photo, F.text.lower() == __("отменить редактирование"))
 async def user_profile_edit(message: Message, state: FSMContext):
     user = message.from_user.id
     if is_authenticated(user):
@@ -92,7 +98,10 @@ async def user_profile_edit(message: Message, state: FSMContext):
         ),
         await state.set_state(ProfileStates.edit_profile)
     else:
-        await state.set_state(BaseStates.language)
+        await message.answer(
+            _('Пожалуйста войдите или зарегистрируйтесь чтобы продолжить'),
+            reply_markup=base_keyboard.get_base_keyboard())
+        await state.set_state(BaseStates.auth)
 
 
 @router.message(ProfileStates.edit_profile)
@@ -284,9 +293,11 @@ async def edit_photo(message: Message, state: FSMContext, bot: Bot):
 
 
 # region my ads
-@router.message(F.text.lower() == __('вернутся к объявлениям'))
-@router.message(F.text.lower() == __("мои обьявления"))
-@router.message(F.text.lower() == __('назад в мои обьявления'))
+@router.message(ProfileStates.add_ads, F.text.lower() == __('вернутся к объявлениям'))
+@router.message(ProfileStates.profile, F.text.lower() == __("мои обьявления"))
+@router.message(ProfileStates.ads, F.text.lower() == __('назад в мои обьявления'))
+@router.message(AdsEditStates.edit, F.text.lower() == __('назад в мои обьявления'))
+@router.message(AdsEditStates.edit_ads_fields, F.text.lower() == __('назад в мои обьявления'))
 async def user_ads(message: Message, state: FSMContext):
     user = message.from_user.id
     user_client = UserApiClient(user)
@@ -329,25 +340,110 @@ async def user_ads(message: Message, state: FSMContext):
             )
         await state.set_state(ProfileStates.ads)
     else:
-        await state.set_state(BaseStates.language)
-
-
-@router.callback_query(MyCallback.filter(F.key == "edit_ads"))
-async def edit_ads(callback: CallbackQuery, callback_data: MyCallback):
-    await callback.message.answer(
-        _('Для изменения данных нажмите кнопку c нужным для вас полем'),
-        reply_markup=management_keyboards.get_profile_edit_ads()
-    )
-
-
-@router.message(F.text.lower() == 'адрес')
-async def edit_ads_address(message: Message):
-    await message.answer(
-        f'{message.from_user}'
-    )
+        await message.answer(
+            _('Пожалуйста войдите или зарегистрируйтесь чтобы продолжить'),
+            reply_markup=base_keyboard.get_base_keyboard())
+        await state.set_state(BaseStates.auth)
 
 
 # endregion my ads
+
+
+# region edit ads
+
+
+@router.callback_query(MyCallback.filter(F.key == "edit_ads"))
+async def edit_ads(callback: CallbackQuery, callback_data: MyCallback, state: FSMContext):
+    await state.update_data(pk=callback_data.pk)
+    await state.set_state(AdsEditStates.edit)
+    await ads_edit(callback.message, state)
+    await callback.answer()
+
+
+@router.message(AdsEditStates.address, F.text.lower() == __('отменить редактирование'))
+@router.message(AdsEditStates.description, F.text.lower() == __('отменить редактирование'))
+@router.message(AdsEditStates.price, F.text.lower() == __('отменить редактирование'))
+@router.message(AdsEditStates.area, F.text.lower() == __('отменить редактирование'))
+@router.message(AdsEditStates.area_kitchen, F.text.lower() == __('отменить редактирование'))
+@router.message(AdsEditStates.layout, F.text.lower() == __('отменить редактирование'))
+@router.message(AdsEditStates.founding_document, F.text.lower() == __('отменить редактирование'))
+@router.message(AdsEditStates.rooms, F.text.lower() == __('отменить редактирование'))
+@router.message(AdsEditStates.condition, F.text.lower() == __('отменить редактирование'))
+async def ads_edit(message: Message, state: FSMContext) -> None:
+    await message.answer(
+        _('Для изменения данных нажмите кнопку c нужным для вас полем'),
+        reply_markup=management_keyboards.get_profile_edit_ads()
+    )
+    await state.set_state(AdsEditStates.edit_ads_fields)
+
+
+@router.message(AdsEditStates.edit_ads_fields)
+async def select_field_ads(message: Message, state: FSMContext):
+    text = message.text
+    if text.lower() == __("адрес"):
+        await message.answer(
+            _("Введите адрес:"),
+            reply_markup=management_keyboards.get_cancel_keyboard()
+        )
+        await state.set_state(AdsEditStates.address)
+    elif text.lower() == __("описание"):
+        await message.answer(
+            _("Введите описание:"),
+            reply_markup=management_keyboards.get_cancel_keyboard()
+        )
+        await state.set_state(AdsEditStates.description)
+    elif text.lower() == __("стоимость"):
+        await message.answer(
+            _("Введите стоимость:"),
+            reply_markup=management_keyboards.get_cancel_keyboard()
+        )
+        await state.set_state(AdsEditStates.price)
+    elif text.lower() == __("общая площадь"):
+        await message.answer(
+            _("Введите общую площадь:"),
+            reply_markup=management_keyboards.get_cancel_keyboard()
+        )
+        await state.set_state(AdsEditStates.area)
+    elif text.lower() == __("площадь кухни"):
+        await message.answer(
+            _("Введите площадь кухни:"),
+            reply_markup=management_keyboards.get_cancel_keyboard()
+        )
+        await state.set_state(AdsEditStates.area_kitchen)
+    elif text.lower() == __("планировка"):
+        await message.answer(
+            _("Выберите планировку:"),
+            reply_markup=management_keyboards.edit_ads_layout_keyboard()
+        )
+        await state.set_state(AdsEditStates.layout)
+    elif text.lower() == __("вид права"):
+        await message.answer(
+            _("Выберите вид права:"),
+            reply_markup=management_keyboards.edit_ads_founding_document_keyboard()
+        )
+        await state.set_state(AdsEditStates.founding_document)
+
+    elif text.lower() == __("количество комнат"):
+        await message.answer(
+            _("Введите Количество комнат:"),
+            reply_markup=management_keyboards.get_cancel_keyboard()
+        )
+        await state.set_state(AdsEditStates.rooms)
+    elif text.lower() == __("жилое состояние"):
+        await message.answer(
+            _("Выберите жилое состояние:"),
+            reply_markup=management_keyboards.edit_ads_condition_keyboard()
+        )
+        await state.set_state(AdsEditStates.area)
+    else:
+        await message.answer(
+            _('Нет такой команды, попробуйте еще раз!')
+        )
+        await state.set_state(ProfileStates.profile)
+
+
+
+# endregion edit ads
 
 
 # region add ads
@@ -670,6 +766,5 @@ async def add_ads(message: Message, state: FSMContext):
         )
         await state.clear()
         await user_ads(message, state)
-
 
 # endregion add ads
