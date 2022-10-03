@@ -22,10 +22,10 @@ def set_tokens(data, user_id):
         user.save()
 
 
-def update_token(data, user_id):
+def update_token(token, user_id):
     user = User.objects(user=user_id)
     if user:
-        user.update_one(token=data.get('access'))
+        user.update_one(token=token)
 
 
 def logout(user_id):
@@ -47,6 +47,12 @@ def get_token(user_id):
     return user.token
 
 
-def get_refresh_token(user_id):
+def get_refresh_token(user_id) -> str:
     user = User.objects(user=user_id).first()
     return user.refresh_token
+
+
+
+
+
+

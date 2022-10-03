@@ -1,57 +1,56 @@
-from aiogram import types, Router
-from aiogram.filters import Command, Text
-from aiogram.fsm.state import StatesGroup, State
-from aiogram.types import Message
+from aiogram import Router, F, types
+from aiogram.filters import Command
+from aiogram.types import Message, MenuButton
 from aiogram.fsm.context import FSMContext
+from pydantic import Field
+
 from database.requests import is_authenticated, logout
 from keyboards import base_keyboard
-from aioredis import Redis
-import asyncio
+from aiogram.utils.i18n import gettext as _
+from aiogram.utils.i18n import lazy_gettext as __
+from settings.states import BaseStates
 
 router = Router()
-redis = Redis()
-
-
-class BaseStates(StatesGroup):
-    language = State()
-    start = State()
 
 
 @router.message(Command(commands=["start"]))
-@router.message(Text(text="К выбору языка"))
+@router.message(BaseStates.auth, F.text.casefold() == __("к выбору языка"))
 async def command_start(message: Message, state: FSMContext):
     await message.answer(
         f'Здравствуйте {message.from_user.first_name} пожалуйста выберите язык чтобы продолжить',
-        reply_markup=base_keyboard.language)
-    await state.set_state(BaseStates.language)
+        reply_markup=base_keyboard.get_language_keyboard())
+    await state.set_state(BaseStates.set_language)
 
 
-@router.message(BaseStates.language)
+@router.message(BaseStates.set_language)
 async def command_start(message: Message, state: FSMContext):
-    language = message.text
-    await redis.set('language', str(language))
-    value = await redis.get('language')
-    await message.answer(
-        f'Пожалуйста войдите или зарегистрируйтесь чтобы продолжить {value}',
-        reply_markup=base_keyboard.keyboard.as_markup(resize_keyboard=True))
-    await state.set_state(BaseStates.start)
+    if message.text.casefold() == "русский" or message.text.casefold() == "украинский":
+        await message.answer(
+            _('Пожалуйста войдите или зарегистрируйтесь чтобы продолжить'),
+            reply_markup=base_keyboard.get_base_keyboard())
+        await state.set_state(BaseStates.auth)
+    else:
+        await message.answer(
+            f'Здравствуйте {message.from_user.first_name} пожалуйста выберите язык чтобы продолжить',
+            reply_markup=base_keyboard.get_language_keyboard())
+        await state.set_state(BaseStates.set_language)
 
 
-@router.message(Text(text="Выход"))
+@router.message(F.text.casefold() == __("выход"))
 async def command_start(message: Message, state: FSMContext):
     if is_authenticated(message.from_user.id):
         logout(message.from_user.id)
         await message.answer(
-            'Пожалуйста войдите или зарегистрируйтесь чтобы продолжить.',
-            reply_markup=base_keyboard.keyboard.as_markup(resize_keyboard=True))
-        await state.set_state(BaseStates.start)
+            _('Пожалуйста войдите или зарегистрируйтесь чтобы продолжить'),
+            reply_markup=base_keyboard.get_base_keyboard())
+        await state.set_state(BaseStates.auth)
 
 
-@router.message(Text(text="Отмена"))
-async def command_start(message: Message, state: FSMContext):
-    await message.answer(
-        'Пожалуйста войдите или зарегистрируйтесь чтобы продолжить.',
-        reply_markup=base_keyboard.keyboard.as_markup(resize_keyboard=True))
-    await state.set_state(BaseStates.start)
-
-
+@router.message(F.text.casefold() == __("отмена"))
+async def command_back(message: Message, state: FSMContext):
+    current_state = await state.get_state()
+    if current_state != BaseStates.set_language:
+        await message.answer(
+            _('Пожалуйста войдите или зарегистрируйтесь чтобы продолжить'),
+            reply_markup=base_keyboard.get_base_keyboard())
+        await state.set_state(BaseStates.auth)

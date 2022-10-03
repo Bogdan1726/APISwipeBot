@@ -1,9 +1,14 @@
 import os
 from dotenv import load_dotenv
-from pathlib import Path
-from pymongo import MongoClient
+
+from aioredis import Redis
+
+REDIS_HOST = str(os.getenv('REDIS_HOST'))
 
 load_dotenv()
+
+redis = Redis(host=REDIS_HOST)
+
 
 TOKEN = str(os.getenv('TOKEN'))
 HOST = str(os.getenv('HOST'))
@@ -16,6 +21,7 @@ DB_NAME = str(os.getenv('DB_NAME'))
 
 # region language
 I18N_DOMAIN = 'APISwipeBot'
-BASE_DIR = Path(__file__).parent
-LOCALES_DIR = BASE_DIR / 'locale'
+LOCALES_DIR = 'locales'
 # endregion language
+
+DEFAULT_IMAGE = "https://st4.depositphotos.com/14953852/22772/v/600/depositphotos_227725052-stock-illustration-no-image-available-icon-flat.jpg"

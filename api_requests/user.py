@@ -1,93 +1,237 @@
+from abc import ABC, abstractmethod
+from httpx import Response
 from database.requests import set_tokens, get_refresh_token
 from settings.config import HOST
-from aiogram.client.session import aiohttp
 from yarl import URL
 from database.requests import get_token, update_token, logout
-
-url = URL.build(
-    scheme='http',
-    host=HOST,
-)
+import httpx
 
 
-async def login(validated_data, user_id):
-    data = {
-        'email': validated_data.get('email'),
-        'password': validated_data.get('password')
-    }
-    async with aiohttp.ClientSession() as session:
-        response = await session.post(url=url.with_path('/login/'), data=data)
-        if response.status == 200:
-            body = await response.json()
-            set_tokens(body, user_id)
-            return True
-        else:
-            return False
+class BaseApiClient(ABC):
 
-
-async def register(validated_data):
-    data = {
-        'email': validated_data.get('email'),
-        'password1': validated_data.get('password1'),
-        'password2': validated_data.get('password2'),
-        'first_name': validated_data.get('first_name'),
-        'last_name': validated_data.get('last_name')
-    }
-    async with aiohttp.ClientSession() as session:
-        response = await session.post(url=url.with_path('/registration/'), data=data)
-        if response.status == 201:
-            return True
-        else:
-            return False
-
-
-async def send_refresh_token(user):
-    async with aiohttp.ClientSession() as session:
-        token = get_refresh_token(user)
-        request = session.post(
-            url=url.with_path('/api/token/refresh/'),
-            data={"refresh": str(token)}
+    def __init__(self, user):
+        self.user = user
+        self.url = URL.build(
+            scheme='http',
+            host=HOST,
         )
-        response = await request
-        if response.status == 200:
-            body = await response.json()
-            update_token(body, user)
-            return True
-        else:
-            logout(user)
-            return False
 
+    @abstractmethod
+    def handler_response_errors(self, response: Response) -> Response:
+        pass
 
-async def test(request, user):
-    response = await request
-    if response.status == 401:
-        async with aiohttp.ClientSession() as session:
-            token = get_refresh_token(user)
-            req = session.post(
-                url=url.with_path('/api/token/refresh/'),
-                data={"refresh": str(token)}
+    @property
+    def client(self):
+        return httpx.Client()
+
+    async def send_refresh_token(self):
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                url=str(self.url.with_path('/api/token/refresh/')),
+                data={"refresh": get_refresh_token(self.user)}
             )
-            resp = await req
-            if resp.status == 200:
-                body = await resp.json()
-                update_token(body, user)
-                response = await request
-                print(response.json())
+            if response.status_code == 200:
+                response_data = response.json()
+                token = response_data.get('access')
+                update_token(token, self.user)
+                return response
             else:
-                logout(user)
-    return response
+                logout(self.user)
+                return response
+
+    async def send_request(self, request):
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.send(request)
+                if response.status_code == 401:
+                    response = await self.send_refresh_token()
+                    response_data = response.json()
+                    if 'access' in response_data:
+                        request.headers['Authorization'] = 'Bearer ' + response_data['access']
+                        response = await client.send(request)
+            return response
+        except Exception as error:
+            raise error
 
 
-async def profile(user):
-    async with aiohttp.ClientSession() as session:
-        request = session.get(
-            url=url.with_path('/user-profile/get_profile/'),
-            headers={
-                'accept': 'application/json',
-                'Authorization': 'Bearer ' + get_token(user)
-            }
-        )
-        response = await test(request, user)
-        if response.status == 200:
-            body = await response.json()
-            return body
+class UserApiClient(BaseApiClient):
+
+    def handler_response_errors(self, response: Response) -> Response:
+        return response
+
+    def get_header(self) -> dict:
+        headers = {
+            'accept': 'application/json',
+            'Authorization': 'Bearer ' + get_token(self.user)
+        }
+        return headers
+
+    async def register(self, validated_data):
+        data = {
+            'email': validated_data.get('email'),
+            'password1': validated_data.get('password1'),
+            'password2': validated_data.get('password2'),
+            'first_name': validated_data.get('first_name'),
+            'last_name': validated_data.get('last_name')
+        }
+        request = self.client.build_request(method='POST',
+                                            url=str(self.url.with_path('/registration/')),
+                                            data=data
+                                            )
+        response = await self.send_request(request)
+        if response.status_code == 201:
+            return True
+        else:
+            return False
+
+    async def login(self, validated_data):
+        data = {
+            'email': validated_data.get('email'),
+            'password': validated_data.get('password')
+        }
+        request = self.client.build_request(method='POST',
+                                            url=str(self.url.with_path('/login/')),
+                                            data=data
+                                            )
+        response = await self.send_request(request)
+        if response.status_code == 200:
+            set_tokens(response.json(), self.user)
+            return True
+        else:
+            return False
+
+    async def profile(self):
+        request = self.client.build_request(method='GET',
+                                            url=str(self.url.with_path('/user-profile/get_profile/')),
+                                            headers=self.get_header()
+                                            )
+        response = await self.send_request(request)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return False
+
+    async def profile_update(self, validated_data):
+        profile_image_path = validated_data.get('profile_image_src') or None
+        data = {
+            'email': validated_data.get('email'),
+            'first_name': validated_data.get('first_name'),
+            'last_name': validated_data.get('last_name'),
+            'phone': validated_data.get('phone'),
+        }
+        request = self.client.build_request(method='PUT',
+                                            url=str(self.url.with_path('/user-profile/update_profile/')),
+                                            headers=self.get_header(),
+                                            data=data,
+                                            files={
+                                                'profile_image': open(profile_image_path, 'rb')
+                                            } if profile_image_path is not None else {})
+
+        response = await self.send_request(request)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return False
+
+    async def user_ads(self):
+        request = self.client.build_request(method='GET',
+                                            url=str(self.url.with_path('/ads/announcement-feed/get_my_announcement/')),
+                                            headers=self.get_header())
+        response = await self.send_request(request)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return False
+
+
+class AdsApiClient(BaseApiClient):
+
+    def handler_response_errors(self, response: Response) -> Response:
+        return response
+
+    def get_header(self) -> dict:
+        headers = {
+            'accept': 'application/json',
+            'Authorization': 'Bearer ' + get_token(self.user)
+        }
+        return headers
+
+    async def create_ads(self, validated_data):
+        image_path = validated_data.get('ads_image_src') or None
+        data = {
+            'address': validated_data.get('address'),
+            'description': validated_data.get('description'),
+            'area': validated_data.get('area'),
+            'area_kitchen': validated_data.get('area_kitchen'),
+            'price': int(validated_data.get('price')),
+            'purpose': validated_data.get('purpose'),
+            'room': validated_data.get('room'),
+            'condition': validated_data.get('condition'),
+            'residential_complex': validated_data.get('house')
+        }
+        request = self.client.build_request(method='POST',
+                                            url=str(self.url.with_path('/ads/announcement/')),
+                                            headers=self.get_header(),
+                                            data=data,
+                                            files={
+                                                'images': open(image_path, 'rb')
+                                            } if image_path is not None else {})
+
+        response = await self.send_request(request)
+        if response.status_code == 201:
+            return response.json()
+        else:
+            return False
+
+    async def get_ads(self, pk):
+        request = self.client.build_request(method='GET',
+                                            url=str(self.url.with_path(f'/ads/announcement-feed/{pk}/')),
+                                            headers=self.get_header())
+
+        response = await self.send_request(request)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return False
+
+    async def update_ads(self, validated_data, pk):
+        data = {
+            'address': validated_data.get('address'),
+            'description': validated_data.get('description'),
+            'area': validated_data.get('area'),
+            'area_kitchen': validated_data.get('area_kitchen'),
+            'price': validated_data.get('price'),
+            'purpose': validated_data.get('purpose'),
+            'rooms': validated_data.get('rooms'),
+            'condition': validated_data.get('condition'),
+            'balcony_or_loggia': validated_data.get('balcony_or_loggia'),
+            'founding_document': validated_data.get('founding_document'),
+            'layout': validated_data.get('layout'),
+            'heating': validated_data.get('heating'),
+            'payment_options': validated_data.get('payment_options'),
+            'agent_commission': validated_data.get('agent_commission'),
+            'communication': validated_data.get('communication')
+        }
+        request = self.client.build_request(method='PUT',
+                                            url=str(self.url.with_path(f'/ads/announcement/{pk}/')),
+                                            headers=self.get_header(),
+                                            data=data)
+
+        response = await self.send_request(request)
+        print(response.json())
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return False
+
+    async def get_announcement_feed(self):
+        request = self.client.build_request(method='GET',
+                                            url=str(self.url.with_path('/ads/announcement-feed/')),
+                                            headers=self.get_header())
+
+        response = await self.send_request(request)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return False
+

@@ -1,48 +1,60 @@
 from aiogram import types
-from aiogram.utils.keyboard import ReplyKeyboardBuilder
+from aiogram.utils.i18n import gettext as _
+from aiogram.utils.i18n import lazy_gettext as __
 
-# types.KeyboardButton(text="Запросить геолокацию", request_location=True),
-# types.KeyboardButton(text="Запросить контакт", request_contact=True)
 
-btn_language = [
-    [
-        types.KeyboardButton(text="Русский"),
-        types.KeyboardButton(text="Украинский")
+def get_base_keyboard():
+    buttons = [
+        [
+            types.KeyboardButton(text=_("Вход")),
+            types.KeyboardButton(text=_("Регистрация"))
+        ],
+        [types.KeyboardButton(text=_("К выбору языка"))]
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=buttons,
+        resize_keyboard=True
+    )
+    return keyboard
+
+
+def get_language_keyboard():
+    buttons = [
+        [
+            types.KeyboardButton(text="Русский"),
+            types.KeyboardButton(text="Украинский")
+        ]
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=buttons,
+        resize_keyboard=True
+    )
+    return keyboard
+
+
+def get_cancel_group_keyboard():
+    buttons = [
+        [
+            types.KeyboardButton(text=_("Отмена")),
+            types.KeyboardButton(text=_('Назад'))
+        ]
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=buttons,
+        resize_keyboard=True
+    )
+    return keyboard
+
+
+def get_cancel_keyboard():
+    buttons = [
+        [
+            types.KeyboardButton(text=_('Отмена'))
+        ]
     ]
 
-]
-language = types.ReplyKeyboardMarkup(
-    keyboard=btn_language,
-    resize_keyboard=True
-)
-
-
-keyboard = ReplyKeyboardBuilder()
-keyboard.row(
-    types.KeyboardButton(text="Вход"),
-    types.KeyboardButton(text="Регистрация")
-)
-
-keyboard.row(
-    types.KeyboardButton(text='К выбору языка')
-)
-
-btn_cancel = [
-    [types.KeyboardButton(text="Отмена")]
-]
-cancel = types.ReplyKeyboardMarkup(
-    keyboard=btn_cancel,
-    resize_keyboard=True
-)
-
-
-btn_auth = [
-    [
-        types.KeyboardButton(text="Авторизоватся"),
-        types.KeyboardButton(text="Отмена")
-    ]
-]
-auth = types.ReplyKeyboardMarkup(
-    keyboard=btn_auth,
-    resize_keyboard=True
-)
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=buttons,
+        resize_keyboard=True
+    )
+    return keyboard

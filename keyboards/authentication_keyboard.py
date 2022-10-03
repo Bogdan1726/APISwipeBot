@@ -1,15 +1,16 @@
 from aiogram import types
-from aiogram.utils.keyboard import ReplyKeyboardBuilder
+from aiogram.utils.i18n import gettext as _
 
-btn_menu = [
-    [
-        types.KeyboardButton(text="Главное меню"),
-        types.KeyboardButton(text="Выход")
+
+def get_auth_keyboard():
+    buttons = [
+        [
+            types.KeyboardButton(text=str(_("Войти"))),
+            types.KeyboardButton(text=str(_("Отмена")))
+        ]
     ]
-]
-
-menu = types.ReplyKeyboardMarkup(
-    keyboard=btn_menu,
-    resize_keyboard=True,
-    input_field_placeholder="Выберите действие"
-)
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=buttons,
+        resize_keyboard=True
+    )
+    return keyboard

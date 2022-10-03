@@ -1,0 +1,1024 @@
+# Ukrainian translations for PROJECT.
+# Copyright (C) 2022 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2022-10-03 17:27+0300\n"
+"PO-Revision-Date: 2022-09-20 16:51+0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: uk\n"
+"Language-Team: uk <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.10.3\n"
+
+#: handlers/ads.py:58
+msgid "объявления"
+msgstr "оголошення"
+
+#: handlers/ads.py:64
+msgid "Добро пожаловать в ленту объявлений"
+msgstr "Ласкаво просимо до стрічки оголошень"
+
+#: handlers/ads.py:75 handlers/ads.py:114
+msgid ""
+"Адрес - {address}\n"
+"Площадь - {area} кв.м\n"
+"Цена - {price} грн\n"
+msgstr ""
+"Адреса - {address}\n"
+"Площа - {area} кв.м\n"
+"Ціна - {price} грн\n"
+
+#: handlers/ads.py:87
+msgid "Лента пуста"
+msgstr "Стрічка порожня"
+
+#: handlers/ads.py:91 handlers/base.py:29 handlers/base.py:44
+#: handlers/base.py:54 handlers/management.py:76 handlers/management.py:81
+#: handlers/management.py:103 handlers/management.py:346
+msgid "Пожалуйста войдите или зарегистрируйтесь чтобы продолжить"
+msgstr "Будь ласка, увійдіть або зареєструйтесь, щоб продовжити"
+
+#: handlers/ads.py:128
+msgid ""
+"Название - {name}\n"
+"Адрес - {address} кв.м\n"
+msgstr ""
+"Назва - {name}\n"
+"Адреса - {address} кв.м\n"
+
+#: handlers/ads.py:138
+msgid "Это было последнее объявление"
+msgstr "Це було останнє оголошення"
+
+#: handlers/ads.py:143
+msgid "Это было первое объявление"
+msgstr "Це було перше оголошення"
+
+#: handlers/ads.py:148
+msgid ""
+"Произошла ошибка вернитесь перезапустите бота командой\n"
+"/start"
+msgstr ""
+"Відбулася помилка поверніться перезапустіть бота командою\n"
+"/start"
+
+#: handlers/authentication.py:14
+msgid "вход"
+msgstr "вхід"
+
+#: handlers/authentication.py:18 handlers/management.py:113
+#: handlers/registration.py:21
+msgid "Введите e-mail:"
+msgstr "Введіть e-mail:"
+
+#: handlers/authentication.py:28
+msgid "Введите пароль:"
+msgstr "Введіть пароль:"
+
+#: handlers/authentication.py:38
+msgid ""
+"Ваши данные для входа \n"
+"E-mail: {email}\n"
+"Пароль: {password}\n"
+"Если все верно нажмите кнопку «Войти»\n"
+"В противном случае нажмите «Отмена» и повторите попытку"
+msgstr ""
+"Ваші дані для входу \n"
+"E-mail: {email}\n"
+"Пароль: {password}\n"
+"Якщо все правильно натисніть кнопку «Авторизуватися»\n"
+"В іншому випадку натисніть «Скасувати» і повторіть спробу"
+
+#: handlers/authentication.py:52
+msgid "войти"
+msgstr "увійти"
+
+#: handlers/authentication.py:59
+msgid ""
+"Авторизация прошла успешно\n"
+"Добро пожаловать в Главное меню"
+msgstr ""
+"Авторизація пройшла успішно\n"
+"Ласкаво просимо до Головного меню"
+
+#: handlers/authentication.py:66
+msgid ""
+"Ошибка авторизации, попробуйте еще\n"
+"Не забудьте убедится в правильности введенных данных"
+msgstr ""
+"Помилка авторизації, спробуйте ще\n"
+"Не забудьте переконатися у правильності введених даних"
+
+#: handlers/authentication.py:73 handlers/authentication.py:74
+msgid "назад в главное меню"
+msgstr "назад до головного меню"
+
+#: handlers/authentication.py:77
+msgid "Добро пожаловать в Главное меню"
+msgstr "Ласкаво просимо до Головного меню"
+
+#: handlers/base.py:17
+msgid "к выбору языка"
+msgstr "до вибору мови"
+
+#: handlers/base.py:39
+msgid "выход"
+msgstr "вихід"
+
+#: handlers/base.py:49
+msgid "отмена"
+msgstr "скасувати"
+
+#: handlers/management.py:49
+msgid "профиль"
+msgstr "профіль"
+
+#: handlers/management.py:50 handlers/management.py:51
+msgid "назад в профиль"
+msgstr "назад до профілю"
+
+#: handlers/management.py:61
+msgid ""
+"Имя: {first_name}\n"
+"Фамилия: {last_name}\n"
+"Телефон: {phone}\n"
+"E-mail: {email}"
+msgstr ""
+"Ім'я: {first_name}\n"
+"Прізвище: {last_name}\n"
+"Телефон: {phone}\n"
+"E-mail: {email}"
+
+#: handlers/management.py:86
+msgid "редактировать профиль"
+msgstr "редагувати профіль"
+
+#: handlers/management.py:87 handlers/management.py:88
+#: handlers/management.py:89 handlers/management.py:90
+#: handlers/management.py:91 handlers/management.py:365
+#: handlers/management.py:366 handlers/management.py:367
+#: handlers/management.py:368 handlers/management.py:369
+#: handlers/management.py:370 handlers/management.py:371
+#: handlers/management.py:372 handlers/management.py:373
+msgid "отменить редактирование"
+msgstr "скасувати редагування"
+
+#: handlers/management.py:96 handlers/management.py:382
+msgid "Для изменения данных нажмите кнопку c нужным для вас полем"
+msgstr "Щоб змінити дані, натисніть кнопку c потрібним для вас полем"
+
+#: handlers/management.py:111 handlers/registration.py:27
+msgid "редактировать email"
+msgstr "редагувати email"
+
+#: handlers/management.py:117
+msgid "редактировать телефон"
+msgstr "редагувати телефон"
+
+#: handlers/management.py:119
+msgid "Введите телефон:"
+msgstr "Введіть телефон:"
+
+#: handlers/management.py:123 handlers/registration.py:168
+msgid "редактировать имя"
+msgstr "редагувати ім'я"
+
+#: handlers/management.py:125 handlers/registration.py:145
+#: handlers/registration.py:162
+msgid "Введите имя:"
+msgstr "Введіть ім'я:"
+
+#: handlers/management.py:129 handlers/registration.py:214
+msgid "редактировать фамилию"
+msgstr "редагувати прізвище"
+
+#: handlers/management.py:131 handlers/registration.py:208
+msgid "Введите фамилию:"
+msgstr "Введіть прізвище:"
+
+#: handlers/management.py:135
+msgid "установить новое фото профиля"
+msgstr "встановити нове фото профілю"
+
+#: handlers/management.py:137
+msgid ""
+"Прикрепите новое фото в сообщении\n"
+"Рекомендуемый размер: (300x300)\n"
+"И не более 20 мегабайт"
+msgstr ""
+"Прикріпіть нове фото у повідомленні\n"
+"Рекомендований розмір: (300x300)\n"
+"І не більше 20 мегабайт"
+
+#: handlers/management.py:145
+msgid "Я не знаю такой команды, попробуйте еще раз!"
+msgstr "Я не знаю такої команди, спробуйте ще раз!"
+
+#: handlers/management.py:155
+msgid ""
+"Электронная почта - имеет неверный формат, пожалуйста, введите адрес "
+"электронной почты еще раз"
+msgstr ""
+"Електронна пошта - має неправильний формат, будь ласка, введіть свою "
+"адресу електронної пошти ще раз"
+
+#: handlers/management.py:165
+msgid "Электронная почта успешно изменена"
+msgstr "Електронна пошта успішно змінена"
+
+#: handlers/management.py:171
+msgid "Возникла ошибка при попытке изменить электронную почту"
+msgstr "Виникла помилка під час спроби змінити електронну пошту"
+
+#: handlers/management.py:182
+msgid "Номер телефона - имеет неверный формат, введите телефон еще раз"
+msgstr "Номер телефону – має невірний формат, введіть телефон ще раз"
+
+#: handlers/management.py:192
+msgid "Номер телефона успешно изменен"
+msgstr "Номер телефону успішно змінено"
+
+#: handlers/management.py:198
+msgid "Возникла ошибка при попытке изменить номер телефона"
+msgstr "Виникла помилка під час спроби змінити номер телефону"
+
+#: handlers/management.py:209
+msgid "Имя  - имеет неверный формат, введите имя еще раз"
+msgstr "Ім'я має невірний формат, введіть ім'я ще раз"
+
+#: handlers/management.py:219
+msgid "Имя успешно изменено"
+msgstr "Ім'я успішно змінено"
+
+#: handlers/management.py:225
+msgid "Возникла ошибка при попытке изменить имя"
+msgstr "Виникла помилка при спробі змінити ім'я"
+
+#: handlers/management.py:236
+msgid "Фамилия  - имеет неверный формат, введите фимилию еще раз"
+msgstr "Прізвище має невірний формат, введіть прізвище ще раз"
+
+#: handlers/management.py:246
+msgid "Фамилия успешно изменена"
+msgstr "Прізвище успішно змінено"
+
+#: handlers/management.py:252
+msgid "Возникла ошибка при попытке изменить фамилию"
+msgstr "Виникла помилка при спробі змінити прізвище"
+
+#: handlers/management.py:264 handlers/management.py:984
+msgid "Фото превышает рекомендуемый размер"
+msgstr "Фото перевищує рекомендований розмір"
+
+#: handlers/management.py:276
+msgid "Фото профиля успешно изменено"
+msgstr "Фото профілю успішно змінено"
+
+#: handlers/management.py:282
+msgid "Возникла ошибка при попытке изменить фото профиля"
+msgstr "Виникла помилка при спробі змінити фото профілю"
+
+#: handlers/management.py:288 handlers/management.py:1025
+msgid "Недопустимый формат фотографии"
+msgstr "Неприпустимий формат фотографії"
+
+#: handlers/management.py:297
+msgid "вернутся к объявлениям"
+msgstr "повернутися до оголошень"
+
+#: handlers/management.py:298
+msgid "мои обьявления"
+msgstr "мої оголошення"
+
+#: handlers/management.py:299 handlers/management.py:300
+#: handlers/management.py:301
+msgid "назад в мои обьявления"
+msgstr "назад в мої оголошення"
+
+#: handlers/management.py:313
+msgid ""
+"{purpose}\n"
+"Адрес - {address}\n"
+"Площадь - {area} кв.м\n"
+"Планировка - {layout}\n"
+"Количество комнат - {rooms}\n"
+"Жилое состояние - {condition}\n"
+"Цена - {price} грн\n"
+"{description}\n"
+msgstr ""
+"{purpose}\n"
+"Адреса - {address}\n"
+"Площа - {area} кв.м\n"
+"Планування - {layout}\n"
+"Кількість кімнат - {rooms}\n"
+"Житловий стан - {condition}\n"
+"Ціна - {price} грн\n"
+"{description}\n"
+
+#: handlers/management.py:333
+msgid ""
+"Чтобы отредактировать объявление, нажмите кнопку рядом с нужным вам "
+"объявлением"
+msgstr ""
+"Щоб відредагувати оголошення, натисніть кнопку поруч із потрібним "
+"вамоголошенням"
+
+#: handlers/management.py:340
+msgid "У вас нет ни одного объявления!"
+msgstr "У вас немає жодного оголошення!"
+
+#: handlers/management.py:388
+msgid "Произошла ошибка, попробуйте еще раз"
+msgstr "Сталася помилка, спробуйте ще раз"
+
+#: handlers/management.py:397
+msgid "адрес"
+msgstr "адреса"
+
+#: handlers/management.py:399
+msgid "Введите адрес:"
+msgstr "Введіть адресу:"
+
+#: handlers/management.py:403
+msgid "описание"
+msgstr "опис"
+
+#: handlers/management.py:405
+msgid "Введите описание:"
+msgstr "Введіть опис:"
+
+#: handlers/management.py:409
+msgid "стоимость"
+msgstr "вартість"
+
+#: handlers/management.py:411
+msgid "Введите стоимость:"
+msgstr "Введіть вартість:"
+
+#: handlers/management.py:415
+msgid "общая площадь"
+msgstr "загальна площа"
+
+#: handlers/management.py:417
+msgid "Введите общую площадь:"
+msgstr "Введіть загальну площу:"
+
+#: handlers/management.py:421
+msgid "площадь кухни"
+msgstr "площа кухні"
+
+#: handlers/management.py:423
+msgid "Введите площадь кухни:"
+msgstr "Введіть площу кухні:"
+
+#: handlers/management.py:427
+msgid "планировка"
+msgstr "планування"
+
+#: handlers/management.py:429
+msgid "Выберите планировку:"
+msgstr "Виберіть планування:"
+
+#: handlers/management.py:433
+msgid "вид права"
+msgstr "вид права"
+
+#: handlers/management.py:435
+msgid "Выберите вид права:"
+msgstr "Виберіть вид права:"
+
+#: handlers/management.py:440
+msgid "количество комнат"
+msgstr "кількість кімнат"
+
+#: handlers/management.py:442
+msgid "Введите Количество комнат:"
+msgstr "Введіть Кількість кімнат:"
+
+#: handlers/management.py:446
+msgid "жилое состояние"
+msgstr "житловий стан"
+
+#: handlers/management.py:448
+msgid "Выберите жилое состояние:"
+msgstr "Виберіть житловий стан:"
+
+#: handlers/management.py:454
+msgid "Нет такой команды, попробуйте еще раз!"
+msgstr "Я не знаю такої команди, спробуйте ще раз!"
+
+#: handlers/management.py:464 handlers/management.py:806
+msgid ""
+"Адрес - имеет неверный формат, попробуйте еще раз\n"
+"Ниже приведен пример правильного формата ввода\n"
+"\n"
+"р-н Центральный, ул. Темерязева 7"
+msgstr ""
+"Адреса - має неправильний формат, спробуйте ще раз\n"
+"Нижче наведено приклад правильного формату введення\n"
+"\n"
+"Р-н Центральний, вул. Темерязєва 7"
+
+#: handlers/management.py:478
+msgid "Адрес успешно изменен"
+msgstr "Адреса успішно змінена"
+
+#: handlers/management.py:484
+msgid "Возникла ошибка при попытке изменить адрес"
+msgstr "Виникла помилка при спробі змінити адресу"
+
+#: handlers/management.py:495
+msgid "Описание - имеет неверный формат, попробуйте еще раз"
+msgstr "Опис - має неправильний формат, спробуйте ще раз"
+
+#: handlers/management.py:507
+msgid "Описание успешно изменено"
+msgstr "Опис успішно змінено"
+
+#: handlers/management.py:513
+msgid "Возникла ошибка при попытке изменить описание"
+msgstr "Виникла помилка при спробі змінити опис"
+
+#: handlers/management.py:524
+msgid "Стоимость - имеет неверный формат, попробуйте еще раз"
+msgstr "Вартість має невірний формат, спробуйте ще раз"
+
+#: handlers/management.py:536
+msgid "Стоимость успешно изменена"
+msgstr "Вартість успішно змінено"
+
+#: handlers/management.py:542
+msgid "Возникла ошибка при попытке изменить стоимость"
+msgstr "Виникла помилка при спробі змінити вартість"
+
+#: handlers/management.py:555
+msgid "Площадь – не может быть меньше площади кухни, попробуйте еще раз"
+msgstr "Площа – не може бути меншою за площу кухні, спробуйте ще раз"
+
+#: handlers/management.py:567
+msgid "Площадь успешно изменена"
+msgstr "Площа успішно змінена"
+
+#: handlers/management.py:573
+msgid "Возникла ошибка при попытке изменить общую площадь"
+msgstr "Виникла помилка при спробі змінити загальну площу"
+
+#: handlers/management.py:586
+msgid "Площадь кухни – не может быть больше общей площади, попробуйте еще раз"
+msgstr "Площа кухні - не може бути більше загальної площі, спробуйте ще раз"
+
+#: handlers/management.py:598
+msgid "Площадь кухни успешно изменена"
+msgstr "Площа кухні успішно змінена"
+
+#: handlers/management.py:604
+msgid "Возникла ошибка при попытке изменить площадь кухни"
+msgstr "Виникла помилка при спробі змінити площу кухні"
+
+#: handlers/management.py:615 handlers/management.py:644
+#: handlers/management.py:702 handlers/management.py:755
+#: handlers/management.py:780 handlers/management.py:917
+msgid ""
+"Выбраного значения нет среди допустимых вариантов, попробуйте еще из "
+"доступных ниже вариантов\n"
+msgstr ""
+"Вибраного значення немає серед допустимих варіантів, спробуйте ще "
+"здоступних нижче варіантів\n"
+
+#: handlers/management.py:627
+msgid "Планировка успешно изменена"
+msgstr "Планування успішно змінено"
+
+#: handlers/management.py:633
+msgid "Возникла ошибка при попытке изменить планировку"
+msgstr "Виникла помилка при спробі змінити планування"
+
+#: handlers/management.py:656
+msgid "Вид права успешно изменен"
+msgstr "Вид права успішно змінено"
+
+#: handlers/management.py:662
+msgid "Возникла ошибка при попытке изменить вид права"
+msgstr "Виникла помилка при спробі змінити вигляд права"
+
+#: handlers/management.py:673 handlers/management.py:891
+msgid "Количество комнат – должно быть от 1-ой до 10-ти \n"
+msgstr "Кількість кімнат – повинна бути від 1 до 10 \n"
+
+#: handlers/management.py:685
+msgid "Количество комнат успешно изменено"
+msgstr "Кількість кімнат успішно змінено"
+
+#: handlers/management.py:691
+msgid "Возникла ошибка при попытке изменить количество комнат"
+msgstr "Виникла помилка при спробі змінити кількість кімнат"
+
+#: handlers/management.py:714
+msgid "Жилое состояние успешно изменено"
+msgstr "Житловий стан успішно змінено"
+
+#: handlers/management.py:720
+msgid "Возникла ошибка при попытке изменить вид жилое состояние"
+msgstr "Виникла помилка при спробі змінити вигляд житловий стан"
+
+#: handlers/management.py:730 handlers/management.py:731
+#: handlers/management.py:742 handlers/management.py:745
+#: handlers/management.py:793 handlers/management.py:796
+#: handlers/management.py:821 handlers/management.py:824
+#: handlers/management.py:850 handlers/management.py:853
+#: handlers/management.py:878 handlers/management.py:881
+#: handlers/management.py:904 handlers/management.py:907
+#: handlers/management.py:930 handlers/management.py:933
+#: handlers/registration.py:16 handlers/registration.py:56
+#: handlers/registration.py:57 handlers/registration.py:60
+#: handlers/registration.py:140 handlers/registration.py:143
+msgid "назад"
+msgstr "назад"
+
+#: handlers/management.py:732
+msgid "добавить объявление"
+msgstr "додати оголошення"
+
+#: handlers/management.py:736
+msgid "Выберите назначение объявления из доступных ниже вариантов\n"
+msgstr "Виберіть призначення оголошення з доступних нижче варіантів\n"
+
+#: handlers/management.py:747 handlers/management.py:769
+#: handlers/management.py:787
+msgid "Укажите адрес"
+msgstr "Вкажіть адресу"
+
+#: handlers/management.py:763
+msgid "Выберите ЖК из доступных ниже вариантов"
+msgstr "Виберіть ЖК із доступних нижче варіантів"
+
+#: handlers/management.py:798 handlers/management.py:815
+msgid "Укажите площадь"
+msgstr "Вкажіть площу"
+
+#: handlers/management.py:826 handlers/management.py:844
+msgid "Укажите площадь кухни"
+msgstr "Вкажіть площу кухні"
+
+#: handlers/management.py:834
+msgid ""
+"Площадь - имеет неверный формат, попробуйте еще раз\n"
+"Ниже приведен пример правильного формата ввода\n"
+"\n"
+"75"
+msgstr ""
+"Площа - має неправильний формат, спробуйте ще раз\n"
+"Нижче наведено приклад правильного формату введення\n"
+"\n"
+"75"
+
+#: handlers/management.py:855 handlers/management.py:872
+msgid "Укажите количество комнат"
+msgstr "Вкажіть кількість кімнат"
+
+#: handlers/management.py:864
+msgid ""
+"Площадь кухни - имеет неверный формат\n"
+"Площадь кухни – не может быть больше общей площади, попробуйте еще раз"
+msgstr ""
+"Площа кухні - має неправильний формат\n"
+"Площа кухні - не може бути більше загальної площі, спробуйте ще раз"
+
+#: handlers/management.py:883 handlers/management.py:898
+msgid "Выберите жилое состояние"
+msgstr "Виберіть житловий стан"
+
+#: handlers/management.py:909 handlers/management.py:924
+msgid "Добавьте описание (мин.длина 20 символов)"
+msgstr "Додати опис (хв.довжина 20 символів)"
+
+#: handlers/management.py:935 handlers/management.py:951
+msgid "Установите цену"
+msgstr "Встановіть ціну"
+
+#: handlers/management.py:943
+msgid ""
+"Описание - имеет неверный формат\n"
+"Описание - должно состоять минимум из 20 символов кириллицы"
+msgstr ""
+"Опис - має неправильний формат\n"
+"Опис - має складатися щонайменше з 20 символів кирилиці"
+
+#: handlers/management.py:962
+msgid ""
+"Цена - имеет неверный формат\n"
+"Диапазон доступной цены – от 0 грн. до 100 000 000 грн."
+msgstr ""
+"Ціна - має неправильний формат\n"
+"Діапазон доступної ціни - від 0 грн. до 100 000 000 грн."
+
+#: handlers/management.py:970
+msgid ""
+"Прикрепите одну фотографию в сообщении\n"
+"Рекомендуемый размер: (800x800)\n"
+"И не более 20 мегабайт"
+msgstr ""
+"Прикріпіть одну фотографію в повідомленні\n"
+"Рекомендований розмір: (800x800)\n"
+"І не більше 20 мегабайт"
+
+#: handlers/management.py:998
+msgid ""
+"Адрес: {address}\n"
+"Назначение: {purpose}\n"
+"Жилой комплекс: {house}\n"
+"Жилое состояние: {condition}\n"
+"Общая площадь: {area} м2\n"
+"Площадь кухни: {area_kitchen} м2\n"
+"Количество комнат: {room} \n"
+"Описание: {description}\n"
+"Цена: {price} - грн\n"
+"Если все верно нажмите «Добавить»\n"
+"Если вы хотите исправить данные, нажимайте «Назад»\n"
+msgstr ""
+"Адреса: {address}\n"
+"Призначення: {purpose}\n"
+"Житловий комплекс: {house}\n"
+"Житловий стан: {condition}\n"
+"Загальна площа: {area} м2\n"
+"Площа кухня: {area_kitchen} м2\n"
+"Кількість кімнат: {room} \n"
+"Опис: {description}\n"
+"Ціна: {price} - грн\n"
+"Якщо все правильно натисніть «Додати»\n"
+"Якщо ви хочете виправити дані, натисніть «Назад»\n"
+
+#: handlers/management.py:1030
+msgid "добавить"
+msgstr "додати"
+
+#: handlers/management.py:1037
+msgid "Объявления успешно добавлено"
+msgstr "Оголошення успішно додано"
+
+#: handlers/management.py:1044
+msgid "При попытке добавить объявление произошла ошибка, попробуйте еще"
+msgstr "При спробі додати оголошення сталася помилка, спробуйте ще"
+
+#: handlers/registration.py:17
+msgid "регистрация"
+msgstr "реєстрація"
+
+#: handlers/registration.py:30
+msgid "Введите новый e-mail, или вернитесь обратно к данным"
+msgstr "Введіть новий e-mail або поверніться назад до даних"
+
+#: handlers/registration.py:38 handlers/registration.py:94
+#: handlers/registration.py:179 handlers/registration.py:225
+#: handlers/registration.py:243
+msgid "вернутся к регистрации"
+msgstr "повернутися до реєстрації"
+
+#: handlers/registration.py:44
+msgid ""
+"Электронная почта - имеет неверный формат, ппопробуйте еще раз, или "
+"вернитесь обратно к данным"
+msgstr ""
+"Електронна пошта - має невірний формат, спробуйте ще раз, або Поверніться"
+" назад до даних"
+
+#: handlers/registration.py:62 handlers/registration.py:77
+msgid "Укажите пароль:"
+msgstr "Вкажіть пароль:"
+
+#: handlers/registration.py:70
+msgid "Электронная почта - имеет неверный формат, ппопробуйте еще раз"
+msgstr ""
+"Електронна пошта - має неправильний формат, будь ласка, введіть свою "
+"адресу електронної пошти ще раз"
+
+#: handlers/registration.py:83
+msgid "редактировать пароль"
+msgstr "редагувати пароль"
+
+#: handlers/registration.py:86
+msgid "Введите новый пароль, или вернитесь обратно к данным"
+msgstr "Введіть новий пароль або поверніться назад до даних"
+
+#: handlers/registration.py:100 handlers/registration.py:120
+msgid ""
+"Пароль слишком простой, попробуйте еще раз \n"
+"Пароль должен: \n"
+"- Содержать число \n"
+"- Содержать символ верхнего и нижнего регистра \n"
+"- Содержать минимум 8 символов\n"
+msgstr ""
+"Пароль занадто простий, спробуйте ще раз \n"
+"Пароль повинен: \n"
+"- Містити число \n"
+"- Містити символ верхнього та нижнього регістру \n"
+"- Мати мінімум 8 символів"
+
+#: handlers/registration.py:131
+msgid "Повторите пароль:"
+msgstr "Повторіть пароль:"
+
+#: handlers/registration.py:155
+msgid "Пароли не совпадают, попробуйте еще раз"
+msgstr "Паролі не збігаються, спробуйте ще раз"
+
+#: handlers/registration.py:171
+msgid "Введите имя заново, или вернитесь обратно к данным"
+msgstr "Введіть ім'я знову, або поверніться назад до даних"
+
+#: handlers/registration.py:185
+msgid ""
+"Введенное имя некорректно, попробуйте еще раз, или вернитесь обратно к "
+"данным"
+msgstr "Введене ім'я некоректне, спробуйте ще раз, або поверніться назад до даним"
+
+#: handlers/registration.py:201
+msgid "Введенное имя некорректно, попробуйте еще раз"
+msgstr "Введене ім'я некоректне, спробуйте ще раз"
+
+#: handlers/registration.py:217
+msgid "Введите фамилию заново, или вернитесь обратно к данным"
+msgstr "Введіть прізвище заново або поверніться назад до даних"
+
+#: handlers/registration.py:231
+msgid ""
+"Введенная фамилия некорректна, попробуйте еще раз, или вернитесь обратно "
+"к данным"
+msgstr ""
+"Введене прізвище некоректне, спробуйте ще раз, або поверніться назаддо "
+"даних"
+
+#: handlers/registration.py:252
+msgid "Введенная фамилия некорректна, попробуйте еще раз"
+msgstr "Введене прізвище некоректне, спробуйте ще раз"
+
+#: handlers/registration.py:259
+msgid ""
+"Ваши данные для регистрации \n"
+"E-mail: {email}\n"
+"Пароль: {password}\n"
+"Имя: {first_name}\n"
+"Фамилия: {last_name}\n"
+"Если все верно нажмите «Зарегистрироватся»\n"
+"Если вы хотите исправить данные, нажмите на кнопку с нужным вам полем\n"
+"Отменить регистрацию, нажмите «Отмена»"
+msgstr ""
+"Ваші дані для реєстрації \n"
+"E-mail: {email}\n"
+"Пароль: {password}\n"
+"Ім'я: {first_name}\n"
+"Прізвище: {last_name}\n"
+"Якщо все правильно натисніть «Зареєструватися»\n"
+"Якщо ви хочете виправити дані, натисніть кнопку з потрібним вам полем\n"
+"Скасувати реєстрацію, натисніть «Скасувати»"
+
+#: handlers/registration.py:278
+msgid "зарегистрироватся"
+msgstr "зареєструватись"
+
+#: handlers/registration.py:285
+msgid ""
+"Регистрация прошла успешно, письмо с подтверждением отправлено\n"
+"на почту {email}\n"
+"Перейдите по ссылке в письме для завершения регистрации"
+msgstr ""
+"Реєстрація пройшла успішно, лист із підтвердженням відправлено\n"
+"на пошту {email}\n"
+"Перейдіть за посиланням у листі для завершення реєстрації"
+
+#: handlers/registration.py:295
+msgid ""
+"Ошибка регистрации, попробуйте еще\n"
+"Не забудьте убедится в правильности введенных данных"
+msgstr ""
+"Помилка реєстрації, спробуйте ще \n"
+"Не забудьте переконатися у правильності введених даних"
+
+#: keyboards/authentication_keyboard.py:8
+msgid "Войти"
+msgstr "Увійти"
+
+#: keyboards/authentication_keyboard.py:9 keyboards/base_keyboard.py:38
+#: keyboards/base_keyboard.py:52 keyboards/registration_keyboard.py:19
+msgid "Отмена"
+msgstr "Скасувати"
+
+#: keyboards/base_keyboard.py:9
+msgid "Вход"
+msgstr "Вхід"
+
+#: keyboards/base_keyboard.py:10
+msgid "Регистрация"
+msgstr "Реєстрація"
+
+#: keyboards/base_keyboard.py:12
+msgid "К выбору языка"
+msgstr "До вибору мови"
+
+#: keyboards/base_keyboard.py:39 keyboards/management_keyboards.py:238
+#: keyboards/management_keyboards.py:263 keyboards/management_keyboards.py:281
+#: keyboards/management_keyboards.py:298
+msgid "Назад"
+msgstr "Назад"
+
+#: keyboards/management_keyboards.py:13
+msgid "Объявления"
+msgstr "Оголошення"
+
+#: keyboards/management_keyboards.py:14
+msgid "Профиль"
+msgstr "Профіль"
+
+#: keyboards/management_keyboards.py:16
+msgid "Выход"
+msgstr "Вихід"
+
+#: keyboards/management_keyboards.py:28
+msgid "Мои обьявления"
+msgstr "Мої оголошення"
+
+#: keyboards/management_keyboards.py:29
+msgid "Редактировать профиль"
+msgstr "Редагувати профіль"
+
+#: keyboards/management_keyboards.py:31 keyboards/management_keyboards.py:343
+msgid "Назад в Главное меню"
+msgstr "Назад до Головного меню"
+
+#: keyboards/management_keyboards.py:43 keyboards/registration_keyboard.py:11
+msgid "Редактировать email"
+msgstr "Редагувати email"
+
+#: keyboards/management_keyboards.py:44
+msgid "Редактировать телефон"
+msgstr "Редагувати телефон"
+
+#: keyboards/management_keyboards.py:47 keyboards/registration_keyboard.py:15
+msgid "Редактировать имя"
+msgstr "Редагувати ім'я"
+
+#: keyboards/management_keyboards.py:48 keyboards/registration_keyboard.py:16
+msgid "Редактировать фамилию"
+msgstr "Редагувати прізвище"
+
+#: keyboards/management_keyboards.py:51
+msgid "Установить новое фото профиля"
+msgstr "Встановити нове фото профілю"
+
+#: keyboards/management_keyboards.py:54 keyboards/management_keyboards.py:81
+#: keyboards/management_keyboards.py:94
+msgid "Назад в Профиль"
+msgstr "Назад до Профілю"
+
+#: keyboards/management_keyboards.py:67 keyboards/management_keyboards.py:166
+#: keyboards/management_keyboards.py:181 keyboards/management_keyboards.py:197
+msgid "Отменить редактирование"
+msgstr "Скасувати редагування"
+
+#: keyboards/management_keyboards.py:95
+msgid "Добавить объявление"
+msgstr "Додати оголошення"
+
+#: keyboards/management_keyboards.py:108
+msgid "Адрес"
+msgstr "Адреса"
+
+#: keyboards/management_keyboards.py:109
+msgid "Описание"
+msgstr "Опис"
+
+#: keyboards/management_keyboards.py:110
+msgid "Стоимость"
+msgstr "Вартість"
+
+#: keyboards/management_keyboards.py:113
+msgid "Общая площадь"
+msgstr "Загальна площа"
+
+#: keyboards/management_keyboards.py:114
+msgid "Площадь кухни"
+msgstr "Площа кухні"
+
+#: keyboards/management_keyboards.py:115
+msgid "Планировка"
+msgstr "Планування"
+
+#: keyboards/management_keyboards.py:118
+msgid "Вид права"
+msgstr "Вид права"
+
+#: keyboards/management_keyboards.py:119
+msgid "Количество комнат"
+msgstr "Кількість кімнат"
+
+#: keyboards/management_keyboards.py:120
+msgid "Жилое состояние"
+msgstr "Житловий стан"
+
+#: keyboards/management_keyboards.py:123
+msgid "Назад в Мои обьявления"
+msgstr "Назад в Мої оголошення"
+
+#: keyboards/management_keyboards.py:150
+msgid "Редактировать объявления"
+msgstr "Редагувати оголошення"
+
+#: keyboards/management_keyboards.py:159 settings/validators.py:112
+msgid "Студия, санузел"
+msgstr "Студія, санвузол"
+
+#: keyboards/management_keyboards.py:160 settings/validators.py:112
+msgid "Классическая"
+msgstr "Класична"
+
+#: keyboards/management_keyboards.py:163 settings/validators.py:112
+msgid "Европланировка"
+msgstr "Європланування"
+
+#: keyboards/management_keyboards.py:164 settings/validators.py:112
+msgid "Свободная"
+msgstr "Вільна"
+
+#: keyboards/management_keyboards.py:178 settings/validators.py:119
+msgid "Собственность"
+msgstr "Власність"
+
+#: keyboards/management_keyboards.py:179 settings/validators.py:119
+msgid "Свидетельство о праве на наследство"
+msgstr "Свідоцтво про право на спадщину"
+
+#: keyboards/management_keyboards.py:193 keyboards/management_keyboards.py:233
+#: settings/validators.py:105
+msgid "Черновая"
+msgstr "Чорнова"
+
+#: keyboards/management_keyboards.py:194 keyboards/management_keyboards.py:234
+#: settings/validators.py:105
+msgid "Ремонт от застройщика"
+msgstr "Ремонт від забудовника"
+
+#: keyboards/management_keyboards.py:195 keyboards/management_keyboards.py:235
+#: settings/validators.py:105
+msgid "В жилом состоянии"
+msgstr "У житловому стані"
+
+#: keyboards/management_keyboards.py:214 settings/validators.py:47
+msgid "Дом"
+msgstr "Будинок"
+
+#: keyboards/management_keyboards.py:215 settings/validators.py:47
+msgid "Квартира"
+msgstr "Квартира"
+
+#: keyboards/management_keyboards.py:218 settings/validators.py:47
+msgid "Коммерческие помещения"
+msgstr "Комерційні приміщення"
+
+#: keyboards/management_keyboards.py:219 settings/validators.py:47
+msgid "Офисное помещение"
+msgstr "Офісне приміщення"
+
+#: keyboards/management_keyboards.py:221 keyboards/management_keyboards.py:241
+#: keyboards/management_keyboards.py:267 keyboards/management_keyboards.py:280
+#: keyboards/management_keyboards.py:297
+msgid "Вернутся к объявлениям"
+msgstr "Повернутися до оголошень"
+
+#: keyboards/management_keyboards.py:294
+msgid "Добавить"
+msgstr "Додати"
+
+#: keyboards/management_keyboards.py:322
+msgid "Предыдущее"
+msgstr "Попереднє"
+
+#: keyboards/management_keyboards.py:326
+msgid "Cледующее"
+msgstr "Наступне"
+
+#: keyboards/management_keyboards.py:332
+msgid "Показать геолокацию"
+msgstr "Показати геолокацію"
+
+#: keyboards/registration_keyboard.py:8
+msgid "Зарегистрироватся"
+msgstr "Зареєструватись"
+
+#: keyboards/registration_keyboard.py:12
+msgid "Редактировать пароль"
+msgstr "Редагувати пароль"
+
+#: keyboards/registration_keyboard.py:32
+msgid "Вернутся к регистрации"
+msgstr "Повернутися до реєстрації"
+
+
