@@ -32,8 +32,6 @@ class AdsEditStates(StatesGroup):
     condition = State()
 
 
-
-
 class ProfileStates(StatesGroup):
     profile = State()
     edit_profile = State()

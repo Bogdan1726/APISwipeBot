@@ -1,3 +1,5 @@
+from enum import Enum
+
 from aiogram import types
 from aiogram.filters.callback_data import CallbackData
 from aiogram.utils.i18n import gettext as _
@@ -103,22 +105,22 @@ def get_my_ads_keyboards():
 def get_profile_edit_ads():
     buttons = [
         [
-            types.KeyboardButton(text=str("Адрес")),
-            types.KeyboardButton(text=str("Описание")),
-            types.KeyboardButton(text=str("Стоимость"))
+            types.KeyboardButton(text=_("Адрес")),
+            types.KeyboardButton(text=_("Описание")),
+            types.KeyboardButton(text=_("Стоимость"))
         ],
         [
-            types.KeyboardButton(text=str("Общая площадь")),
-            types.KeyboardButton(text=str("Площадь кухни")),
-            types.KeyboardButton(text=str("Планировка"))
+            types.KeyboardButton(text=_("Общая площадь")),
+            types.KeyboardButton(text=_("Площадь кухни")),
+            types.KeyboardButton(text=_("Планировка"))
         ],
         [
-            types.KeyboardButton(text=str('Вид права')),
-            types.KeyboardButton(text=str('Количество комнат')),
-            types.KeyboardButton(text=str('Жилое состояние'))
+            types.KeyboardButton(text=_('Вид права')),
+            types.KeyboardButton(text=_('Количество комнат')),
+            types.KeyboardButton(text=_('Жилое состояние'))
         ],
         [
-            types.KeyboardButton(text=str('Назад в Мои обьявления'))
+            types.KeyboardButton(text=_('Назад в Мои обьявления'))
         ]
     ]
     keyboard = types.ReplyKeyboardMarkup(
@@ -129,12 +131,20 @@ def get_profile_edit_ads():
 
 
 # region edit ads
+
+class AdsData(str, Enum):
+    ban = "ban"
+    kick = "kick"
+    warn = "warn"
+
+
 class MyCallback(CallbackData, prefix="ads"):
     pk: int
     key: str
 
 
-def get_edit_ads_keyboard(pk):
+def get_edit_ads_keyboard(
+        pk):
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
         text=_("Редактировать объявления"),
@@ -166,7 +176,7 @@ def edit_ads_founding_document_keyboard():
     buttons = [
         [
             types.KeyboardButton(text=str(_("Собственность"))),
-            types.KeyboardButton(text=str(_("Свидетильство о праве на наследство"))),
+            types.KeyboardButton(text=str(_("Свидетельство о праве на наследство"))),
         ],
         [types.KeyboardButton(text=str(_('Отменить редактирование')))]
     ]

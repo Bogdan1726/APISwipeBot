@@ -1,4 +1,4 @@
-aiogram
+--pre aiogram
 python-dotenv==0.21.0
 redis
 aioredis==2.0.1
@@ -7,3 +7,4 @@ mongoengine==0.24.2
 yarl
 babel==2.10.3
 httpx
+aiogram

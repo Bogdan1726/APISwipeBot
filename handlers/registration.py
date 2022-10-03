@@ -13,7 +13,7 @@ router = Router()
 
 
 # region e-mail
-@router.message(RegistrationStates.write_password1, F.text.lower() == __('назад'))
+@router.message(RegistrationStates.write_password1, F.text.casefold() == __('назад'))
 @router.message(BaseStates.auth, F.text.lower() == __("регистрация"))
 @router.message(RegistrationStates.start_registration)
 async def register_email(message: Message, state: FSMContext) -> None:
@@ -24,7 +24,7 @@ async def register_email(message: Message, state: FSMContext) -> None:
     await state.set_state(RegistrationStates.write_mail)
 
 
-@router.message(RegistrationStates.register, F.text.lower() == __('редактировать email'))
+@router.message(RegistrationStates.register, F.text.casefold() == __('редактировать email'))
 async def register_edit_email(message: Message, state: FSMContext) -> None:
     await message.answer(
         _("Введите новый e-mail, или вернитесь обратно к данным"),
@@ -53,11 +53,11 @@ async def register_edit_email_check(message: Message, state: FSMContext) -> None
 
 # region password 1
 
-@router.message(RegistrationStates.write_first_name, F.text.lower() == __('назад'))
-@router.message(RegistrationStates.write_password2, F.text.lower() == __('назад'))
+@router.message(RegistrationStates.write_first_name, F.text.casefold() == __('назад'))
+@router.message(RegistrationStates.write_password2, F.text.casefold() == __('назад'))
 @router.message(RegistrationStates.write_mail)
 async def register_password1(message: Message, state: FSMContext) -> None:
-    if message.text.lower() == __('назад'):
+    if message.text.casefold() == __('назад'):
         await message.answer(
             _("Укажите пароль:"),
             reply_markup=base_keyboard.get_cancel_group_keyboard()
@@ -80,7 +80,7 @@ async def register_password1(message: Message, state: FSMContext) -> None:
             await state.set_state(RegistrationStates.write_password1)
 
 
-@router.message(RegistrationStates.register, F.text.lower() == __('редактировать пароль'))
+@router.message(RegistrationStates.register, F.text.casefold() == __('редактировать пароль'))
 async def register_edit_password(message: Message, state: FSMContext) -> None:
     await message.answer(
         _("Введите новый пароль, или вернитесь обратно к данным"),
@@ -165,7 +165,7 @@ async def register_first_name(message: Message, state: FSMContext):
             await state.set_state(RegistrationStates.write_first_name)
 
 
-@router.message(RegistrationStates.register, F.text.lower() == __('редактировать имя'))
+@router.message(RegistrationStates.register, F.text.casefold() == __('редактировать имя'))
 async def register_edit_first_name(message: Message, state: FSMContext) -> None:
     await message.answer(
         _("Введите имя заново, или вернитесь обратно к данным"),
@@ -176,7 +176,7 @@ async def register_edit_first_name(message: Message, state: FSMContext) -> None:
 
 @router.message(RegistrationStates.edit_first_name)
 async def register_first_name_check(message: Message, state: FSMContext) -> None:
-    if message.text.lower() == __('вернутся к регистрации'):
+    if message.text.casefold() == __('вернутся к регистрации'):
         await register_last_name(message, state)
     else:
         first_name = message.text
@@ -211,7 +211,7 @@ async def register_last_name(message: Message, state: FSMContext):
         await state.set_state(RegistrationStates.write_last_name)
 
 
-@router.message(RegistrationStates.register, F.text.lower() == __('редактировать фамилию'))
+@router.message(RegistrationStates.register, F.text.casefold() == __('редактировать фамилию'))
 async def register_edit_last_name(message: Message, state: FSMContext) -> None:
     await message.answer(
         _("Введите фамилию заново, или вернитесь обратно к данным"),
@@ -222,7 +222,7 @@ async def register_edit_last_name(message: Message, state: FSMContext) -> None:
 
 @router.message(RegistrationStates.edit_last_name)
 async def register_last_name_check(message: Message, state: FSMContext) -> None:
-    if message.text.lower() == __('вернутся к регистрации'):
+    if message.text.casefold() == __('вернутся к регистрации'):
         await register_last_name(message, state)
     else:
         last_name = message.text
@@ -240,7 +240,7 @@ async def register_last_name_check(message: Message, state: FSMContext) -> None:
 
 
 # region data and send data
-@router.message(F.text.lower() == __('вернутся к регистрации'))
+@router.message(F.text.casefold() == __('вернутся к регистрации'))
 @router.message(RegistrationStates.write_last_name)
 @router.message(RegistrationStates.register_edit_data)
 async def register_last_name(message: Message, state: FSMContext):
@@ -275,7 +275,7 @@ async def register_last_name(message: Message, state: FSMContext):
     await state.set_state(RegistrationStates.register)
 
 
-@router.message(F.text.lower() == __("зарегистрироватся"))
+@router.message(F.text.casefold() == __("зарегистрироватся"))
 async def registration(message: Message, state: FSMContext):
     validated_data = await state.get_data()
     user_client = UserApiClient(message.from_user.id)

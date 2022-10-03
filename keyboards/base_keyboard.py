@@ -21,8 +21,8 @@ def get_base_keyboard():
 def get_language_keyboard():
     buttons = [
         [
-            types.KeyboardButton(text=str(__("Русский"))),
-            types.KeyboardButton(text=str(__("Украинский")))
+            types.KeyboardButton(text="Русский"),
+            types.KeyboardButton(text="Украинский")
         ]
     ]
     keyboard = types.ReplyKeyboardMarkup(

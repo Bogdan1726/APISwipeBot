@@ -81,6 +81,16 @@ def validate_kitchen(area: str, area_kitchen: str) -> bool:
         return False
 
 
+def validate_area_edit_ads(area: str, area_kitchen: str) -> bool:
+    if area.isdigit() and len(area) <= 4:
+        if area > area_kitchen:
+            return True
+        else:
+            return False
+    else:
+        return False
+
+
 def validate_room(room: str) -> bool:
     if room.isdigit():
         if int(room) <= 10:
@@ -93,6 +103,20 @@ def validate_room(room: str) -> bool:
 
 def validate_condition(condition: str) -> bool:
     if condition in [_("Черновая"), _("Ремонт от застройщика"), _("В жилом состоянии")]:
+        return True
+    else:
+        return False
+
+
+def validate_layout(layout: str) -> bool:
+    if layout in [_("Студия, санузел"), _("Классическая"), _("Европланировка"), _("Свободная")]:
+        return True
+    else:
+        return False
+
+
+def validate_founding_document(founding_document: str) -> bool:
+    if founding_document in [_("Собственность"), _("Свидетельство о праве на наследство")]:
         return True
     else:
         return False
@@ -117,6 +141,16 @@ def validate_price(price: str) -> bool:
 
 
 def parse_ads_data(data: dict) -> dict:
+    founding_document_dic = {
+        "Власність": "Собственность",
+        "Свідоцтво про право на спадщину": "Свидетельство о праве на наследство"
+    }
+    layout_dic = {
+        "Студія, санвузол": "Студия, санузел",
+        "Класична": "Классическая",
+        "Європланування": "Европланировка",
+        'Вільна': "Свободная"
+    }
     purpose_dic = {
         "Будинок": "Дом",
         "Квартира": "Квартира",
@@ -139,6 +173,8 @@ def parse_ads_data(data: dict) -> dict:
     condition = data.get('condition')
     purpose = data.get('purpose')
     residential_complex = data.get('house')
+    layout = data.get('layout')
+    founding_document = data.get('founding_document')
 
     if condition_dic.get(condition):
         _condition = condition_dic.get(condition)
@@ -149,4 +185,10 @@ def parse_ads_data(data: dict) -> dict:
     if residential_complex_dic.get(residential_complex):
         _residential_complex = residential_complex_dic.get(residential_complex)
         data['house'] = _residential_complex
+    if layout_dic.get(layout):
+        _layout = layout_dic.get(layout)
+        data['layout'] = _layout
+    if founding_document_dic.get(founding_document):
+        _founding_document = founding_document_dic.get(founding_document)
+        data['founding_document'] = _founding_document
     return data

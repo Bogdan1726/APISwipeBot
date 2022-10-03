@@ -183,6 +183,47 @@ class AdsApiClient(BaseApiClient):
         else:
             return False
 
+    async def get_ads(self, pk):
+        request = self.client.build_request(method='GET',
+                                            url=str(self.url.with_path(f'/ads/announcement-feed/{pk}/')),
+                                            headers=self.get_header())
+
+        response = await self.send_request(request)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return False
+
+    async def update_ads(self, validated_data, pk):
+        data = {
+            'address': validated_data.get('address'),
+            'description': validated_data.get('description'),
+            'area': validated_data.get('area'),
+            'area_kitchen': validated_data.get('area_kitchen'),
+            'price': validated_data.get('price'),
+            'purpose': validated_data.get('purpose'),
+            'rooms': validated_data.get('rooms'),
+            'condition': validated_data.get('condition'),
+            'balcony_or_loggia': validated_data.get('balcony_or_loggia'),
+            'founding_document': validated_data.get('founding_document'),
+            'layout': validated_data.get('layout'),
+            'heating': validated_data.get('heating'),
+            'payment_options': validated_data.get('payment_options'),
+            'agent_commission': validated_data.get('agent_commission'),
+            'communication': validated_data.get('communication')
+        }
+        request = self.client.build_request(method='PUT',
+                                            url=str(self.url.with_path(f'/ads/announcement/{pk}/')),
+                                            headers=self.get_header(),
+                                            data=data)
+
+        response = await self.send_request(request)
+        print(response.json())
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return False
+
     async def get_announcement_feed(self):
         request = self.client.build_request(method='GET',
                                             url=str(self.url.with_path('/ads/announcement-feed/')),
@@ -193,3 +234,4 @@ class AdsApiClient(BaseApiClient):
             return response.json()
         else:
             return False
+

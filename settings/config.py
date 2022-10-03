@@ -1,13 +1,13 @@
 import os
 from dotenv import load_dotenv
-from pathlib import Path
-from pymongo import MongoClient
+
 from aioredis import Redis
 
+REDIS_HOST = str(os.getenv('REDIS_HOST'))
 
 load_dotenv()
 
-redis = Redis()
+redis = Redis(host=REDIS_HOST)
 
 
 TOKEN = str(os.getenv('TOKEN'))

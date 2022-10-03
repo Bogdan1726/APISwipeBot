@@ -15,7 +15,8 @@ from settings.states import ProfileStates, BaseStates, AuthenticationStates, Ann
 from settings.validators import (
     validate_email, validate_name, validate_phone, validate_image, validate_purpose,
     validate_address, validate_house, validate_area, validate_kitchen, validate_room, validate_condition,
-    validate_description, validate_price, parse_ads_data, validate_image_ads
+    validate_description, validate_price, parse_ads_data, validate_image_ads, validate_layout,
+    validate_founding_document, validate_area_edit_ads
 )
 
 router = Router()
@@ -143,7 +144,7 @@ async def select_field(message: Message, state: FSMContext):
         await message.answer(
             _('Я не знаю такой команды, попробуйте еще раз!')
         )
-        await state.set_state(ProfileStates.profile)
+        await state.set_state(ProfileStates.edit_profile)
 
 
 @router.message(ProfileStates.email)
@@ -332,6 +333,7 @@ async def user_ads(message: Message, state: FSMContext):
                 text=_('Чтобы отредактировать объявление, нажмите кнопку рядом с нужным вам объявлением'),
                 reply_markup=management_keyboards.get_my_ads_keyboards()
             )
+            await state.update_data(from_user_id=message.from_user.id)
             await state.set_state(ProfileStates.ads)
         else:
             await message.answer(
@@ -369,12 +371,24 @@ async def edit_ads(callback: CallbackQuery, callback_data: MyCallback, state: FS
 @router.message(AdsEditStates.founding_document, F.text.lower() == __('отменить редактирование'))
 @router.message(AdsEditStates.rooms, F.text.lower() == __('отменить редактирование'))
 @router.message(AdsEditStates.condition, F.text.lower() == __('отменить редактирование'))
+@router.message(AdsEditStates.edit)
 async def ads_edit(message: Message, state: FSMContext) -> None:
-    await message.answer(
-        _('Для изменения данных нажмите кнопку c нужным для вас полем'),
-        reply_markup=management_keyboards.get_profile_edit_ads()
-    )
-    await state.set_state(AdsEditStates.edit_ads_fields)
+    data = await state.get_data()
+    ads_client = AdsApiClient(data.get('from_user_id'))
+    response = await ads_client.get_ads(data.get('pk'))
+    if response:
+        await state.update_data(edit_ads=response)
+        await message.answer(
+            _('Для изменения данных нажмите кнопку c нужным для вас полем'),
+            reply_markup=management_keyboards.get_profile_edit_ads()
+        )
+        await state.set_state(AdsEditStates.edit_ads_fields)
+    else:
+        await message.answer(
+            _('Произошла ошибка, попробуйте еще раз'),
+            reply_markup=management_keyboards.get_my_ads_keyboards()
+        )
+        await state.set_state(AdsEditStates.edit)
 
 
 @router.message(AdsEditStates.edit_ads_fields)
@@ -434,13 +448,279 @@ async def select_field_ads(message: Message, state: FSMContext):
             _("Выберите жилое состояние:"),
             reply_markup=management_keyboards.edit_ads_condition_keyboard()
         )
-        await state.set_state(AdsEditStates.area)
+        await state.set_state(AdsEditStates.condition)
     else:
         await message.answer(
             _('Нет такой команды, попробуйте еще раз!')
         )
-        await state.set_state(ProfileStates.profile)
+        await state.set_state(AdsEditStates.edit_ads_fields)
 
+
+@router.message(AdsEditStates.address)
+async def ads_edit_address(message: Message, state: FSMContext):
+    address = message.text
+    if validate_address(address) is False:
+        await message.answer(
+            _('Адрес - имеет неверный формат, попробуйте еще раз\n'
+              'Ниже приведен пример правильного формата ввода\n\n'
+              'р-н Центральный, ул. Темерязева 7'),
+            reply_markup=management_keyboards.get_cancel_keyboard()
+        )
+        await state.set_state(AdsEditStates.address)
+    else:
+        data = await state.get_data()
+        data.get('edit_ads')['address'] = address
+        ads_client = AdsApiClient(message.from_user.id)
+        validated_data = parse_ads_data(data.get('edit_ads'))
+        response = await ads_client.update_ads(validated_data, data.get('pk'))
+        if response:
+            await message.answer(
+                _('Адрес успешно изменен'),
+                reply_markup=management_keyboards.get_profile_edit_ads()
+            )
+            await state.set_state(AdsEditStates.edit_ads_fields)
+        else:
+            await message.answer(
+                _('Возникла ошибка при попытке изменить адрес'),
+                reply_markup=management_keyboards.get_profile_edit_ads()
+            )
+            await state.set_state(AdsEditStates.edit_ads_fields)
+
+
+@router.message(AdsEditStates.description)
+async def ads_edit_description(message: Message, state: FSMContext):
+    description = message.text
+    if validate_description(description) is False:
+        await message.answer(
+            _('Описание - имеет неверный формат, попробуйте еще раз'),
+            reply_markup=management_keyboards.get_cancel_keyboard()
+        )
+        await state.set_state(AdsEditStates.description)
+    else:
+        data = await state.get_data()
+        data.get('edit_ads')['description'] = description
+        ads_client = AdsApiClient(message.from_user.id)
+        validated_data = parse_ads_data(data.get('edit_ads'))
+        response = await ads_client.update_ads(validated_data, data.get('pk'))
+        if response:
+            await message.answer(
+                _('Описание успешно изменено'),
+                reply_markup=management_keyboards.get_profile_edit_ads()
+            )
+            await state.set_state(AdsEditStates.edit_ads_fields)
+        else:
+            await message.answer(
+                _('Возникла ошибка при попытке изменить описание'),
+                reply_markup=management_keyboards.get_profile_edit_ads()
+            )
+            await state.set_state(AdsEditStates.edit_ads_fields)
+
+
+@router.message(AdsEditStates.price)
+async def ads_edit_price(message: Message, state: FSMContext):
+    price = message.text.replace(' ', '')
+    if validate_price(price) is False:
+        await message.answer(
+            _('Стоимость - имеет неверный формат, попробуйте еще раз'),
+            reply_markup=management_keyboards.get_cancel_keyboard()
+        )
+        await state.set_state(AdsEditStates.price)
+    else:
+        data = await state.get_data()
+        data.get('edit_ads')['price'] = price
+        ads_client = AdsApiClient(message.from_user.id)
+        validated_data = parse_ads_data(data.get('edit_ads'))
+        response = await ads_client.update_ads(validated_data, data.get('pk'))
+        if response:
+            await message.answer(
+                _('Стоимость успешно изменена'),
+                reply_markup=management_keyboards.get_profile_edit_ads()
+            )
+            await state.set_state(AdsEditStates.edit_ads_fields)
+        else:
+            await message.answer(
+                _('Возникла ошибка при попытке изменить стоимость'),
+                reply_markup=management_keyboards.get_profile_edit_ads()
+            )
+            await state.set_state(AdsEditStates.edit_ads_fields)
+
+
+@router.message(AdsEditStates.area)
+async def ads_edit_area(message: Message, state: FSMContext):
+    data = await state.get_data()
+    area_kitchen = data.get('edit_ads')['area_kitchen']
+    area = message.text
+    if validate_area_edit_ads(area, area_kitchen) is False:
+        await message.answer(
+            _('Площадь – не может быть меньше площади кухни, попробуйте еще раз'),
+            reply_markup=management_keyboards.get_cancel_keyboard()
+        )
+        await state.set_state(AdsEditStates.area)
+    else:
+        data = await state.get_data()
+        data.get('edit_ads')['area'] = area
+        ads_client = AdsApiClient(message.from_user.id)
+        validated_data = parse_ads_data(data.get('edit_ads'))
+        response = await ads_client.update_ads(validated_data, data.get('pk'))
+        if response:
+            await message.answer(
+                _('Площадь успешно изменена'),
+                reply_markup=management_keyboards.get_profile_edit_ads()
+            )
+            await state.set_state(AdsEditStates.edit_ads_fields)
+        else:
+            await message.answer(
+                _('Возникла ошибка при попытке изменить общую площадь'),
+                reply_markup=management_keyboards.get_profile_edit_ads()
+            )
+            await state.set_state(AdsEditStates.edit_ads_fields)
+
+
+@router.message(AdsEditStates.area_kitchen)
+async def ads_edit_area_kitchen(message: Message, state: FSMContext):
+    data = await state.get_data()
+    area = data.get('edit_ads')['area']
+    area_kitchen = message.text
+    if validate_kitchen(area, area_kitchen) is False:
+        await message.answer(
+            _('Площадь кухни – не может быть больше общей площади, попробуйте еще раз'),
+            reply_markup=management_keyboards.get_cancel_keyboard()
+        )
+        await state.set_state(AdsEditStates.area_kitchen)
+    else:
+        data = await state.get_data()
+        data.get('edit_ads')['area_kitchen'] = area_kitchen
+        ads_client = AdsApiClient(message.from_user.id)
+        validated_data = parse_ads_data(data.get('edit_ads'))
+        response = await ads_client.update_ads(validated_data, data.get('pk'))
+        if response:
+            await message.answer(
+                _('Площадь кухни успешно изменена'),
+                reply_markup=management_keyboards.get_profile_edit_ads()
+            )
+            await state.set_state(AdsEditStates.edit_ads_fields)
+        else:
+            await message.answer(
+                _('Возникла ошибка при попытке изменить площадь кухни'),
+                reply_markup=management_keyboards.get_profile_edit_ads()
+            )
+            await state.set_state(AdsEditStates.edit_ads_fields)
+
+
+@router.message(AdsEditStates.layout)
+async def ads_edit_layout(message: Message, state: FSMContext):
+    layout = message.text
+    if validate_layout(layout) is False:
+        await message.answer(
+            _('Выбраного значения нет среди допустимых вариантов, попробуйте еще из доступных ниже вариантов\n'),
+            reply_markup=management_keyboards.get_cancel_keyboard()
+        )
+        await state.set_state(AdsEditStates.layout)
+    else:
+        data = await state.get_data()
+        data.get('edit_ads')['layout'] = layout
+        ads_client = AdsApiClient(message.from_user.id)
+        validated_data = parse_ads_data(data.get('edit_ads'))
+        response = await ads_client.update_ads(validated_data, data.get('pk'))
+        if response:
+            await message.answer(
+                _('Планировка успешно изменена'),
+                reply_markup=management_keyboards.get_profile_edit_ads()
+            )
+            await state.set_state(AdsEditStates.edit_ads_fields)
+        else:
+            await message.answer(
+                _('Возникла ошибка при попытке изменить планировку'),
+                reply_markup=management_keyboards.get_profile_edit_ads()
+            )
+            await state.set_state(AdsEditStates.edit_ads_fields)
+
+
+@router.message(AdsEditStates.founding_document)
+async def ads_edit_founding_document(message: Message, state: FSMContext):
+    founding_document = message.text
+    if validate_founding_document(founding_document) is False:
+        await message.answer(
+            _('Выбраного значения нет среди допустимых вариантов, попробуйте еще из доступных ниже вариантов\n'),
+            reply_markup=management_keyboards.get_cancel_keyboard()
+        )
+        await state.set_state(AdsEditStates.founding_document)
+    else:
+        data = await state.get_data()
+        data.get('edit_ads')['founding_document'] = founding_document
+        ads_client = AdsApiClient(message.from_user.id)
+        validated_data = parse_ads_data(data.get('edit_ads'))
+        response = await ads_client.update_ads(validated_data, data.get('pk'))
+        if response:
+            await message.answer(
+                _('Вид права успешно изменен'),
+                reply_markup=management_keyboards.get_profile_edit_ads()
+            )
+            await state.set_state(AdsEditStates.edit_ads_fields)
+        else:
+            await message.answer(
+                _('Возникла ошибка при попытке изменить вид права'),
+                reply_markup=management_keyboards.get_profile_edit_ads()
+            )
+            await state.set_state(AdsEditStates.edit_ads_fields)
+
+
+@router.message(AdsEditStates.rooms)
+async def ads_edit_rooms(message: Message, state: FSMContext):
+    rooms = message.text
+    if validate_room(rooms) is False:
+        await message.answer(
+            _('Количество комнат – должно быть от 1-ой до 10-ти \n'),
+            reply_markup=management_keyboards.get_cancel_keyboard()
+        )
+        await state.set_state(AdsEditStates.rooms)
+    else:
+        data = await state.get_data()
+        data.get('edit_ads')['rooms'] = rooms
+        ads_client = AdsApiClient(message.from_user.id)
+        validated_data = parse_ads_data(data.get('edit_ads'))
+        response = await ads_client.update_ads(validated_data, data.get('pk'))
+        if response:
+            await message.answer(
+                _('Количество комнат успешно изменено'),
+                reply_markup=management_keyboards.get_profile_edit_ads()
+            )
+            await state.set_state(AdsEditStates.edit_ads_fields)
+        else:
+            await message.answer(
+                _('Возникла ошибка при попытке изменить количество комнат'),
+                reply_markup=management_keyboards.get_profile_edit_ads()
+            )
+            await state.set_state(AdsEditStates.edit_ads_fields)
+
+
+@router.message(AdsEditStates.condition)
+async def ads_edit_condition(message: Message, state: FSMContext):
+    condition = message.text
+    if validate_condition(condition) is False:
+        await message.answer(
+            _('Выбраного значения нет среди допустимых вариантов, попробуйте еще из доступных ниже вариантов\n'),
+            reply_markup=management_keyboards.get_cancel_keyboard()
+        )
+        await state.set_state(AdsEditStates.condition)
+    else:
+        data = await state.get_data()
+        data.get('edit_ads')['condition'] = condition
+        ads_client = AdsApiClient(message.from_user.id)
+        validated_data = parse_ads_data(data.get('edit_ads'))
+        response = await ads_client.update_ads(validated_data, data.get('pk'))
+        if response:
+            await message.answer(
+                _('Жилое состояние успешно изменено'),
+                reply_markup=management_keyboards.get_profile_edit_ads()
+            )
+            await state.set_state(AdsEditStates.edit_ads_fields)
+        else:
+            await message.answer(
+                _('Возникла ошибка при попытке изменить вид жилое состояние'),
+                reply_markup=management_keyboards.get_profile_edit_ads()
+            )
+            await state.set_state(AdsEditStates.edit_ads_fields)
 
 
 # endregion edit ads

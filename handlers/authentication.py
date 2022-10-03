@@ -11,7 +11,7 @@ from settings.states import AuthenticationStates, BaseStates, AnnouncementStates
 router = Router()
 
 
-@router.message(BaseStates.auth, F.text.lower() == __("вход"))
+@router.message(BaseStates.auth, F.text.casefold() == __("вход"))
 async def login_email(message: Message, state: FSMContext) -> None:
     await state.set_state(AuthenticationStates.email)
     await message.answer(
@@ -49,7 +49,7 @@ async def authentication(message: Message, state: FSMContext) -> None:
     await state.set_state(AuthenticationStates.auth)
 
 
-@router.message(AuthenticationStates.auth, F.text.lower() == __("войти"))
+@router.message(AuthenticationStates.auth, F.text.casefold() == __("войти"))
 async def authentication(message: Message, state: FSMContext) -> None:
     validated_data = await state.get_data()
     user_client = UserApiClient(message.from_user.id)
@@ -70,8 +70,8 @@ async def authentication(message: Message, state: FSMContext) -> None:
         await state.set_state(BaseStates.auth)
 
 
-@router.message(AnnouncementStates.ads, F.text.lower() == __("назад в главное меню"))
-@router.message(ProfileStates.profile, F.text.lower() == __("назад в главное меню"))
+@router.message(AnnouncementStates.ads, F.text.casefold() == __("назад в главное меню"))
+@router.message(ProfileStates.profile, F.text.casefold() == __("назад в главное меню"))
 async def main_menu(message: Message, state: FSMContext) -> None:
     await message.answer(
         _('Добро пожаловать в Главное меню'),
