@@ -289,7 +289,7 @@ async def registration(message: Message, state: FSMContext):
             ),
             reply_markup=base_keyboard.get_base_keyboard()
         )
-        await state.clear()
+        await state.set_state(BaseStates.auth)
     else:
         await message.answer(
             _('Ошибка регистрации, попробуйте еще\n'

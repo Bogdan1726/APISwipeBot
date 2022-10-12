@@ -112,7 +112,11 @@ class UserApiClient(BaseApiClient):
             return False
 
     async def profile_update(self, validated_data):
-        profile_image_path = validated_data.get('profile_image_src') or None
+        profile_image_path = None
+        if 'profile_image' in validated_data and validated_data['profile_image'] is not None:
+            image = validated_data['profile_image'].split('/')
+            if image[1] != 'media':
+                profile_image_path = validated_data.get('profile_image') or None
         data = {
             'email': validated_data.get('email'),
             'first_name': validated_data.get('first_name'),
@@ -165,7 +169,7 @@ class AdsApiClient(BaseApiClient):
             'area_kitchen': validated_data.get('area_kitchen'),
             'price': int(validated_data.get('price')),
             'purpose': validated_data.get('purpose'),
-            'room': validated_data.get('room'),
+            'rooms': validated_data.get('rooms'),
             'condition': validated_data.get('condition'),
             'residential_complex': validated_data.get('house')
         }
