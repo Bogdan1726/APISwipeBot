@@ -14,7 +14,7 @@ from settings.config import HOST, DEFAULT_IMAGE
 from settings.states import ProfileStates, BaseStates, AuthenticationStates, AnnouncementStates, AdsEditStates
 from settings.validators import (
     validate_email, validate_name, validate_phone, validate_image, validate_purpose,
-    validate_address, validate_house, validate_area, validate_kitchen, validate_room, validate_condition,
+    validate_address, validate_house, validate_area, validate_room, validate_condition,
     validate_description, validate_price, parse_ads_data, validate_image_ads, validate_layout,
     validate_founding_document, validate_area_edit_ads
 )
@@ -268,7 +268,7 @@ async def edit_photo(message: Message, state: FSMContext, bot: Bot):
             filename, file_extension = os.path.splitext(file.file_path)
             src = 'files/' + file.file_id + file_extension
             await bot.download_file(file_path=file.file_path, destination=src)
-            await state.update_data(profile_image_src=src)
+            await state.update_data(profile_image=src)
             data = await state.get_data()
             user_client = UserApiClient(message.from_user.id)
             if await user_client.profile_update(data):
@@ -295,6 +295,7 @@ async def edit_photo(message: Message, state: FSMContext, bot: Bot):
 
 # region my ads
 @router.message(ProfileStates.add_ads, F.text.lower() == __('вернутся к объявлениям'))
+@router.message(ProfileStates.add_ads_data, F.text.lower() == __('вернутся к объявлениям'))
 @router.message(ProfileStates.profile, F.text.lower() == __("мои обьявления"))
 @router.message(ProfileStates.ads, F.text.lower() == __('назад в мои обьявления'))
 @router.message(AdsEditStates.edit, F.text.lower() == __('назад в мои обьявления'))
@@ -313,6 +314,7 @@ async def user_ads(message: Message, state: FSMContext):
                     _("{purpose}\n"
                       "Адрес - {address}\n"
                       "Площадь - {area} кв.м\n"
+                      "Площадь кухни - {area_kitchen} кв.м\n"
                       "Планировка - {layout}\n"
                       "Количество комнат - {rooms}\n"
                       "Жилое состояние - {condition}\n"
@@ -320,6 +322,7 @@ async def user_ads(message: Message, state: FSMContext):
                       "{description}\n").format(
                         address=ads.get('address'),
                         area=ads.get('area'),
+                        area_kitchen=ads.get('area_kitchen'),
                         rooms=ads.get('rooms'),
                         price=ads.get('price'),
                         purpose=html.bold(ads.get('purpose')),
@@ -338,7 +341,7 @@ async def user_ads(message: Message, state: FSMContext):
         else:
             await message.answer(
                 _('У вас нет ни одного объявления!'),
-                reply_markup=management_keyboards.get_profile_cancel()
+                reply_markup=management_keyboards.get_my_ads_keyboards()
             )
         await state.set_state(ProfileStates.ads)
     else:
@@ -470,6 +473,7 @@ async def ads_edit_address(message: Message, state: FSMContext):
     else:
         data = await state.get_data()
         data.get('edit_ads')['address'] = address
+        await state.update_data(data)
         ads_client = AdsApiClient(message.from_user.id)
         validated_data = parse_ads_data(data.get('edit_ads'))
         response = await ads_client.update_ads(validated_data, data.get('pk'))
@@ -499,6 +503,7 @@ async def ads_edit_description(message: Message, state: FSMContext):
     else:
         data = await state.get_data()
         data.get('edit_ads')['description'] = description
+        await state.update_data(data)
         ads_client = AdsApiClient(message.from_user.id)
         validated_data = parse_ads_data(data.get('edit_ads'))
         response = await ads_client.update_ads(validated_data, data.get('pk'))
@@ -528,6 +533,7 @@ async def ads_edit_price(message: Message, state: FSMContext):
     else:
         data = await state.get_data()
         data.get('edit_ads')['price'] = price
+        await state.update_data(data)
         ads_client = AdsApiClient(message.from_user.id)
         validated_data = parse_ads_data(data.get('edit_ads'))
         response = await ads_client.update_ads(validated_data, data.get('pk'))
@@ -559,6 +565,7 @@ async def ads_edit_area(message: Message, state: FSMContext):
     else:
         data = await state.get_data()
         data.get('edit_ads')['area'] = area
+        await state.update_data(data)
         ads_client = AdsApiClient(message.from_user.id)
         validated_data = parse_ads_data(data.get('edit_ads'))
         response = await ads_client.update_ads(validated_data, data.get('pk'))
@@ -581,7 +588,7 @@ async def ads_edit_area_kitchen(message: Message, state: FSMContext):
     data = await state.get_data()
     area = data.get('edit_ads')['area']
     area_kitchen = message.text
-    if validate_kitchen(area, area_kitchen) is False:
+    if validate_area_edit_ads(area, area_kitchen) is False:
         await message.answer(
             _('Площадь кухни – не может быть больше общей площади, попробуйте еще раз'),
             reply_markup=management_keyboards.get_cancel_keyboard()
@@ -590,6 +597,7 @@ async def ads_edit_area_kitchen(message: Message, state: FSMContext):
     else:
         data = await state.get_data()
         data.get('edit_ads')['area_kitchen'] = area_kitchen
+        await state.update_data(data)
         ads_client = AdsApiClient(message.from_user.id)
         validated_data = parse_ads_data(data.get('edit_ads'))
         response = await ads_client.update_ads(validated_data, data.get('pk'))
@@ -619,6 +627,7 @@ async def ads_edit_layout(message: Message, state: FSMContext):
     else:
         data = await state.get_data()
         data.get('edit_ads')['layout'] = layout
+        await state.update_data(data)
         ads_client = AdsApiClient(message.from_user.id)
         validated_data = parse_ads_data(data.get('edit_ads'))
         response = await ads_client.update_ads(validated_data, data.get('pk'))
@@ -648,6 +657,7 @@ async def ads_edit_founding_document(message: Message, state: FSMContext):
     else:
         data = await state.get_data()
         data.get('edit_ads')['founding_document'] = founding_document
+        await state.update_data(data)
         ads_client = AdsApiClient(message.from_user.id)
         validated_data = parse_ads_data(data.get('edit_ads'))
         response = await ads_client.update_ads(validated_data, data.get('pk'))
@@ -677,6 +687,7 @@ async def ads_edit_rooms(message: Message, state: FSMContext):
     else:
         data = await state.get_data()
         data.get('edit_ads')['rooms'] = rooms
+        await state.update_data(data)
         ads_client = AdsApiClient(message.from_user.id)
         validated_data = parse_ads_data(data.get('edit_ads'))
         response = await ads_client.update_ads(validated_data, data.get('pk'))
@@ -706,6 +717,7 @@ async def ads_edit_condition(message: Message, state: FSMContext):
     else:
         data = await state.get_data()
         data.get('edit_ads')['condition'] = condition
+        await state.update_data(data)
         ads_client = AdsApiClient(message.from_user.id)
         validated_data = parse_ads_data(data.get('edit_ads'))
         response = await ads_client.update_ads(validated_data, data.get('pk'))
@@ -742,289 +754,319 @@ async def add_ads_start(message: Message, state: FSMContext):
 @router.message(ProfileStates.add_ads_address, F.text.lower() == __('назад'))
 @router.message(ProfileStates.add_ads)
 async def add_ads_purpose(message: Message, state: FSMContext):
-    if message.text.lower() == __('назад'):
-        await message.answer(
-            _('Укажите адрес'),
-            reply_markup=management_keyboards.add_ads_back_keyboard()
-        )
-        await state.set_state(ProfileStates.add_ads_purpose)
+    if message.text.lower() == __('вернутся к объявлениям'):
+        await user_ads(message, state)
     else:
-        purpose = message.text
-        if validate_purpose(purpose) is False:
+        if message.text.lower() == __('назад'):
             await message.answer(
-                _('Выбраного значения нет среди допустимых вариантов, попробуйте еще из доступных ниже вариантов\n'),
-                reply_markup=management_keyboards.add_ads_purpose_keyboard()
+                _('Укажите адрес'),
+                reply_markup=management_keyboards.add_ads_back_keyboard()
             )
-            await state.set_state(ProfileStates.add_ads)
+            await state.set_state(ProfileStates.add_ads_purpose)
         else:
-            await state.update_data(purpose=purpose)
-            if purpose == 'Квартира':
+            purpose = message.text
+            if validate_purpose(purpose) is False:
                 await message.answer(
-                    _('Выберите ЖК из доступных ниже вариантов'),
-                    reply_markup=management_keyboards.add_ads_house_keyboard()
+                    _('Выбраного значения нет среди допустимых вариантов, попробуйте еще из доступных ниже вариантов\n'),
+                    reply_markup=management_keyboards.add_ads_purpose_keyboard()
                 )
-                await state.set_state(ProfileStates.add_ads_house)
+                await state.set_state(ProfileStates.add_ads)
             else:
-                await message.answer(
-                    _('Укажите адрес'),
-                    reply_markup=management_keyboards.add_ads_back_keyboard()
-                )
-                await state.set_state(ProfileStates.add_ads_purpose)
+                await state.update_data(purpose=purpose)
+                if purpose == 'Квартира':
+                    await message.answer(
+                        _('Выберите ЖК из доступных ниже вариантов'),
+                        reply_markup=management_keyboards.add_ads_house_keyboard()
+                    )
+                    await state.set_state(ProfileStates.add_ads_house)
+                else:
+                    await message.answer(
+                        _('Укажите адрес'),
+                        reply_markup=management_keyboards.add_ads_back_keyboard()
+                    )
+                    await state.set_state(ProfileStates.add_ads_purpose)
 
 
 @router.message(ProfileStates.add_ads_house)
 async def add_ads_house(message: Message, state: FSMContext):
-    house = message.text
-    if validate_house(house) is False:
-        await message.answer(
-            _('Выбраного значения нет среди допустимых вариантов, попробуйте еще из доступных ниже вариантов\n'),
-            reply_markup=management_keyboards.add_ads_house_keyboard()
-        )
-        await state.set_state(ProfileStates.add_ads_house)
+    if message.text.lower() == __('вернутся к объявлениям'):
+        await user_ads(message, state)
     else:
-        await state.update_data(house=house)
-        await message.answer(
-            _('Укажите адрес'),
-            reply_markup=management_keyboards.add_ads_back_keyboard()
-        )
-        await state.set_state(ProfileStates.add_ads_purpose)
+        house = message.text
+        if validate_house(house) is False:
+            await message.answer(
+                _('Выбраного значения нет среди допустимых вариантов, попробуйте еще из доступных ниже вариантов\n'),
+                reply_markup=management_keyboards.add_ads_house_keyboard()
+            )
+            await state.set_state(ProfileStates.add_ads_house)
+        else:
+            await state.update_data(house=house)
+            await message.answer(
+                _('Укажите адрес'),
+                reply_markup=management_keyboards.add_ads_back_keyboard()
+            )
+            await state.set_state(ProfileStates.add_ads_purpose)
 
 
 @router.message(ProfileStates.add_ads_area, F.text.lower() == __('назад'))
 @router.message(ProfileStates.add_ads_purpose)
 async def add_ads_address(message: Message, state: FSMContext):
-    if message.text.lower() == __('назад'):
-        await message.answer(
-            _('Укажите площадь'),
-            reply_markup=management_keyboards.add_ads_back_keyboard()
-        )
-        await state.set_state(ProfileStates.add_ads_address)
+    if message.text.lower() == __('вернутся к объявлениям'):
+        await user_ads(message, state)
     else:
-        address = message.text
-        if validate_address(address) is False:
-            await message.answer(
-                _('Адрес - имеет неверный формат, попробуйте еще раз\n'
-                  'Ниже приведен пример правильного формата ввода\n\n'
-                  'р-н Центральный, ул. Темерязева 7'),
-                reply_markup=management_keyboards.add_ads_back_keyboard()
-            )
-            await state.set_state(ProfileStates.add_ads_purpose)
-        else:
-            await state.update_data(address=address)
+        if message.text.lower() == __('назад'):
             await message.answer(
                 _('Укажите площадь'),
                 reply_markup=management_keyboards.add_ads_back_keyboard()
             )
             await state.set_state(ProfileStates.add_ads_address)
+        else:
+            address = message.text
+            if validate_address(address) is False:
+                await message.answer(
+                    _('Адрес - имеет неверный формат, попробуйте еще раз\n'
+                      'Ниже приведен пример правильного формата ввода\n\n'
+                      'р-н Центральный, ул. Темерязева 7'),
+                    reply_markup=management_keyboards.add_ads_back_keyboard()
+                )
+                await state.set_state(ProfileStates.add_ads_purpose)
+            else:
+                await state.update_data(address=address)
+                await message.answer(
+                    _('Укажите площадь'),
+                    reply_markup=management_keyboards.add_ads_back_keyboard()
+                )
+                await state.set_state(ProfileStates.add_ads_address)
 
 
 @router.message(ProfileStates.add_ads_area_kitchen, F.text.lower() == __('назад'))
 @router.message(ProfileStates.add_ads_address)
 async def add_ads_area(message: Message, state: FSMContext):
-    if message.text.lower() == __('назад'):
-        await message.answer(
-            _('Укажите площадь кухни'),
-            reply_markup=management_keyboards.add_ads_back_keyboard()
-        )
-        await state.set_state(ProfileStates.add_ads_area)
+    if message.text.lower() == __('вернутся к объявлениям'):
+        await user_ads(message, state)
     else:
-        area = message.text
-        if validate_area(area) is False:
-            await message.answer(
-                _('Площадь - имеет неверный формат, попробуйте еще раз\n'
-                  'Ниже приведен пример правильного формата ввода\n\n'
-                  '75'
-                  ),
-                reply_markup=management_keyboards.add_ads_back_keyboard()
-            )
-            await state.set_state(ProfileStates.add_ads_address)
-        else:
-            await state.update_data(area=area)
+        if message.text.lower() == __('назад'):
             await message.answer(
                 _('Укажите площадь кухни'),
                 reply_markup=management_keyboards.add_ads_back_keyboard()
             )
             await state.set_state(ProfileStates.add_ads_area)
+        else:
+            area = message.text
+            if validate_area(area) is False:
+                await message.answer(
+                    _('Площадь - имеет неверный формат, попробуйте еще раз\n'
+                      'Ниже приведен пример правильного формата ввода\n\n'
+                      '75'
+                      ),
+                    reply_markup=management_keyboards.add_ads_back_keyboard()
+                )
+                await state.set_state(ProfileStates.add_ads_address)
+            else:
+                await state.update_data(area=area)
+                await message.answer(
+                    _('Укажите площадь кухни'),
+                    reply_markup=management_keyboards.add_ads_back_keyboard()
+                )
+                await state.set_state(ProfileStates.add_ads_area)
 
 
 @router.message(ProfileStates.add_ads_room, F.text.lower() == __('назад'))
 @router.message(ProfileStates.add_ads_area)
 async def add_ads_area_kitchen(message: Message, state: FSMContext):
-    if message.text.lower() == __('назад'):
-        await message.answer(
-            _('Укажите количество комнат'),
-            reply_markup=management_keyboards.add_ads_back_keyboard()
-        )
-        await state.set_state(ProfileStates.add_ads_area_kitchen)
+    if message.text.lower() == __('вернутся к объявлениям'):
+        await user_ads(message, state)
     else:
-        data = await state.get_data()
-        area_kitchen = message.text
-        if validate_kitchen(data.get('area'), area_kitchen) is False:
-            await message.answer(
-                _('Площадь кухни - имеет неверный формат\n'
-                  'Площадь кухни – не может быть больше общей площади, попробуйте еще раз'),
-                reply_markup=management_keyboards.add_ads_back_keyboard()
-            )
-            await state.set_state(ProfileStates.add_ads_area)
-        else:
-            await state.update_data(area_kitchen=area_kitchen)
+        if message.text.lower() == __('назад'):
             await message.answer(
                 _('Укажите количество комнат'),
                 reply_markup=management_keyboards.add_ads_back_keyboard()
             )
             await state.set_state(ProfileStates.add_ads_area_kitchen)
+        else:
+            data = await state.get_data()
+            area_kitchen = message.text
+            if validate_area_edit_ads(data.get('area'), area_kitchen) is False:
+                await message.answer(
+                    _('Площадь кухни - имеет неверный формат\n'
+                      'Площадь кухни – не может быть больше общей площади, попробуйте еще раз'),
+                    reply_markup=management_keyboards.add_ads_back_keyboard()
+                )
+                await state.set_state(ProfileStates.add_ads_area)
+            else:
+                await state.update_data(area_kitchen=area_kitchen)
+                await message.answer(
+                    _('Укажите количество комнат'),
+                    reply_markup=management_keyboards.add_ads_back_keyboard()
+                )
+                await state.set_state(ProfileStates.add_ads_area_kitchen)
 
 
 @router.message(ProfileStates.add_ads_condition, F.text.lower() == __('назад'))
 @router.message(ProfileStates.add_ads_area_kitchen)
 async def add_ads_room(message: Message, state: FSMContext):
-    if message.text.lower() == __('назад'):
-        await message.answer(
-            _('Выберите жилое состояние'),
-            reply_markup=management_keyboards.add_ads_condition_keyboard()
-        )
-        await state.set_state(ProfileStates.add_ads_room)
+    if message.text.lower() == __('вернутся к объявлениям'):
+        await user_ads(message, state)
     else:
-        room = message.text
-        if validate_room(room) is False:
-            await message.answer(
-                _('Количество комнат – должно быть от 1-ой до 10-ти \n'),
-                reply_markup=management_keyboards.add_ads_back_keyboard()
-            )
-            await state.set_state(ProfileStates.add_ads_area_kitchen)
-        else:
-            await state.update_data(room=room)
+        if message.text.lower() == __('назад'):
             await message.answer(
                 _('Выберите жилое состояние'),
                 reply_markup=management_keyboards.add_ads_condition_keyboard()
             )
             await state.set_state(ProfileStates.add_ads_room)
+        else:
+            rooms = message.text
+            if validate_room(rooms) is False:
+                await message.answer(
+                    _('Количество комнат – должно быть от 1-ой до 10-ти \n'),
+                    reply_markup=management_keyboards.add_ads_back_keyboard()
+                )
+                await state.set_state(ProfileStates.add_ads_area_kitchen)
+            else:
+                await state.update_data(rooms=rooms)
+                await message.answer(
+                    _('Выберите жилое состояние'),
+                    reply_markup=management_keyboards.add_ads_condition_keyboard()
+                )
+                await state.set_state(ProfileStates.add_ads_room)
 
 
 @router.message(ProfileStates.add_ads_description, F.text.lower() == __('назад'))
 @router.message(ProfileStates.add_ads_room)
 async def add_ads_condition(message: Message, state: FSMContext):
-    if message.text.lower() == __('назад'):
-        await message.answer(
-            _('Добавьте описание (мин.длина 20 символов)'),
-            reply_markup=management_keyboards.add_ads_back_keyboard()
-        )
-        await state.set_state(ProfileStates.add_ads_condition)
+    if message.text.lower() == __('вернутся к объявлениям'):
+        await user_ads(message, state)
     else:
-        condition = message.text
-        if validate_condition(condition) is False:
-            await message.answer(
-                _('Выбраного значения нет среди допустимых вариантов, попробуйте еще из доступных ниже вариантов\n'),
-                reply_markup=management_keyboards.add_ads_condition_keyboard()
-            )
-            await state.set_state(ProfileStates.add_ads_room)
-        else:
-            await state.update_data(condition=condition)
+        if message.text.lower() == __('назад'):
             await message.answer(
                 _('Добавьте описание (мин.длина 20 символов)'),
                 reply_markup=management_keyboards.add_ads_back_keyboard()
             )
             await state.set_state(ProfileStates.add_ads_condition)
+        else:
+            condition = message.text
+            if validate_condition(condition) is False:
+                await message.answer(
+                    _('Выбраного значения нет среди допустимых вариантов, попробуйте еще из доступных ниже вариантов\n'),
+                    reply_markup=management_keyboards.add_ads_condition_keyboard()
+                )
+                await state.set_state(ProfileStates.add_ads_room)
+            else:
+                await state.update_data(condition=condition)
+                await message.answer(
+                    _('Добавьте описание (мин.длина 20 символов)'),
+                    reply_markup=management_keyboards.add_ads_back_keyboard()
+                )
+                await state.set_state(ProfileStates.add_ads_condition)
 
 
 @router.message(ProfileStates.add_ads_price, F.text.lower() == __('назад'))
 @router.message(ProfileStates.add_ads_condition)
 async def add_ads_description(message: Message, state: FSMContext):
-    if message.text.lower() == __('назад'):
-        await message.answer(
-            _('Установите цену'),
-            reply_markup=management_keyboards.add_ads_back_keyboard()
-        )
-        await state.set_state(ProfileStates.add_ads_description)
+    if message.text.lower() == __('вернутся к объявлениям'):
+        await user_ads(message, state)
     else:
-        description = message.text
-        if validate_description(description) is False:
-            await message.answer(
-                _('Описание - имеет неверный формат\n'
-                  'Описание - должно состоять минимум из 20 символов кириллицы'),
-                reply_markup=management_keyboards.add_ads_back_keyboard()
-            )
-            await state.set_state(ProfileStates.add_ads_condition)
-        else:
-            await state.update_data(description=description)
+        if message.text.lower() == __('назад'):
             await message.answer(
                 _('Установите цену'),
                 reply_markup=management_keyboards.add_ads_back_keyboard()
             )
             await state.set_state(ProfileStates.add_ads_description)
+        else:
+            description = message.text
+            if validate_description(description) is False:
+                await message.answer(
+                    _('Описание - имеет неверный формат\n'
+                      'Описание - должно состоять минимум из 20 символов кириллицы'),
+                    reply_markup=management_keyboards.add_ads_back_keyboard()
+                )
+                await state.set_state(ProfileStates.add_ads_condition)
+            else:
+                await state.update_data(description=description)
+                await message.answer(
+                    _('Установите цену'),
+                    reply_markup=management_keyboards.add_ads_back_keyboard()
+                )
+                await state.set_state(ProfileStates.add_ads_description)
 
 
 @router.message(ProfileStates.add_ads_description)
-async def edit_photo(message: Message, state: FSMContext, bot: Bot):
-    price = message.text.replace(' ', '')
-    if validate_price(price) is False:
-        await message.answer(
-            _('Цена - имеет неверный формат\n'
-              'Диапазон доступной цены – от 0 грн. до 100 000 000 грн.'),
-            reply_markup=management_keyboards.add_ads_back_keyboard()
-        )
-        await state.set_state(ProfileStates.add_ads_description)
+async def edit_photo(message: Message, state: FSMContext):
+    if message.text.lower() == __('вернутся к объявлениям'):
+        await user_ads(message, state)
     else:
-        await state.update_data(price=price)
-        await message.answer(
-            _("Прикрепите одну фотографию в сообщении\n"
-              "Рекомендуемый размер: (800x800)\n"
-              "И не более 20 мегабайт"),
-            reply_markup=management_keyboards.add_ads_back_keyboard()
-        )
-        await state.set_state(ProfileStates.add_ads_price)
+        price = message.text.replace(' ', '')
+        if validate_price(price) is False:
+            await message.answer(
+                _('Цена - имеет неверный формат\n'
+                  'Диапазон доступной цены – от 0 грн. до 100 000 000 грн.'),
+                reply_markup=management_keyboards.add_ads_back_keyboard()
+            )
+            await state.set_state(ProfileStates.add_ads_description)
+        else:
+            await state.update_data(price=price)
+            await message.answer(
+                _("Прикрепите одну фотографию в сообщении\n"
+                  "Рекомендуемый размер: (800x800)\n"
+                  "И не более 20 мегабайт"),
+                reply_markup=management_keyboards.add_ads_back_keyboard()
+            )
+            await state.set_state(ProfileStates.add_ads_price)
 
 
 @router.message(ProfileStates.add_ads_price)
 async def add_ads_description(message: Message, state: FSMContext, bot: Bot):
-    try:
-        photo = message.photo[-1]
-        if validate_image_ads(photo) is False:
+    if message.text and message.text.lower() == __('вернутся к объявлениям'):
+        await user_ads(message, state)
+    else:
+        try:
+            photo = message.photo[-1]
+            if validate_image_ads(photo) is False:
+                await message.answer(
+                    _('Фото превышает рекомендуемый размер')
+                )
+                await state.set_state(ProfileStates.add_ads_price)
+            else:
+                file = await bot.get_file(photo.file_id)
+                filename, file_extension = os.path.splitext(file.file_path)
+                src = 'files/ads/' + file.file_id + file_extension
+                await bot.download_file(file_path=file.file_path, destination=src)
+                await state.update_data(ads_image_src=src)
+                data = await state.get_data()
+                image = FSInputFile(data.get('ads_image_src'))
+                await message.answer_photo(
+                    photo=image,
+                    caption=
+                    _('Адрес: {address}\n'
+                      'Назначение: {purpose}\n'
+                      'Жилой комплекс: {house}\n'
+                      'Жилое состояние: {condition}\n'
+                      'Общая площадь: {area} м2\n'
+                      'Площадь кухни: {area_kitchen} м2\n'
+                      'Количество комнат: {rooms} \n'
+                      'Описание: {description}\n'
+                      'Цена: {price} - грн\n'
+                      'Если все верно нажмите «Добавить»\n'
+                      'Если вы хотите исправить данные, нажимайте «Назад»\n'
+                      ).format(
+                        address=data.get('address'),
+                        house=data.get('house') if data.get(
+                            'house') else 'Вы выбрали назначение которое не требует выбора ЖК',
+                        purpose=data.get('purpose'),
+                        condition=data.get('condition'),
+                        area=data.get('area'),
+                        description=data.get('description'),
+                        area_kitchen=data.get('area_kitchen'),
+                        price=data.get('price'),
+                        rooms=data.get('rooms')),
+                    reply_markup=management_keyboards.add_ads_finish()
+                )
+                await state.set_state(ProfileStates.add_ads_data)
+        except TypeError:
             await message.answer(
-                _('Фото превышает рекомендуемый размер')
+                _('Недопустимый формат фотографии'),
+                reply_markup=management_keyboards.add_ads_back_keyboard()
             )
-            await state.set_state(ProfileStates.add_ads_price)
-        else:
-            file = await bot.get_file(photo.file_id)
-            filename, file_extension = os.path.splitext(file.file_path)
-            src = 'files/ads/' + file.file_id + file_extension
-            await bot.download_file(file_path=file.file_path, destination=src)
-            await state.update_data(ads_image_src=src)
-            data = await state.get_data()
-            image = FSInputFile(data.get('ads_image_src'))
-            await message.answer_photo(
-                photo=image,
-                caption=
-                _('Адрес: {address}\n'
-                  'Назначение: {purpose}\n'
-                  'Жилой комплекс: {house}\n'
-                  'Жилое состояние: {condition}\n'
-                  'Общая площадь: {area} м2\n'
-                  'Площадь кухни: {area_kitchen} м2\n'
-                  'Количество комнат: {room} \n'
-                  'Описание: {description}\n'
-                  'Цена: {price} - грн\n'
-                  'Если все верно нажмите «Добавить»\n'
-                  'Если вы хотите исправить данные, нажимайте «Назад»\n'
-                  ).format(
-                    address=data.get('address'),
-                    house=data.get('house') if data.get(
-                        'house') else 'Вы выбрали назначение которое не требует выбора ЖК',
-                    purpose=data.get('purpose'),
-                    condition=data.get('condition'),
-                    area=data.get('area'),
-                    description=data.get('description'),
-                    area_kitchen=data.get('area_kitchen'),
-                    price=data.get('price'),
-                    room=data.get('room')),
-                reply_markup=management_keyboards.add_ads_finish()
-            )
-            await state.set_state(ProfileStates.add_ads_data)
-    except TypeError:
-        await message.answer(
-            _('Недопустимый формат фотографии'),
-            reply_markup=management_keyboards.add_ads_back_keyboard()
-        )
 
 
 @router.message(ProfileStates.add_ads_data, F.text.lower() == __('добавить'))

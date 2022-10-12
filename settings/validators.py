@@ -65,29 +65,20 @@ def validate_house(house: str) -> bool:
 
 
 def validate_area(area: str) -> bool:
-    if area.isdigit() and len(area) <= 4:
-        return True
-    else:
-        return False
-
-
-def validate_kitchen(area: str, area_kitchen: str) -> bool:
-    if area_kitchen.isdigit() and len(area_kitchen) <= 4:
-        if area > area_kitchen:
+    try:
+        if 0 < float(area) < 1000:
             return True
-        else:
-            return False
-    else:
+        return False
+    except ValueError:
         return False
 
 
 def validate_area_edit_ads(area: str, area_kitchen: str) -> bool:
-    if area.isdigit() and len(area) <= 4:
-        if area > area_kitchen:
+    try:
+        if 0 < float(area) < 1000 and 0 < float(area_kitchen) < 1000 and float(area) > float(area_kitchen):
             return True
-        else:
-            return False
-    else:
+        return False
+    except ValueError:
         return False
 
 
